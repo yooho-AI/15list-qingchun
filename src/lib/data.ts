@@ -515,9 +515,7 @@ export const ENDINGS: Ending[] = [
 export const STORY_INFO = {
   title: '青春练习生',
   subtitle: 'AI 女团养成游戏',
-  description: '在偶像工业的残酷选拔中，用汗水与梦想证明自己。12期综艺，3位攻略对象，你的选择决定出道命运。',
-  genre: '偶像养成',
-  emoji: '⭐',
+  description: '恭喜你通过面试。从今天起，你是天星传媒的练习生。12期考核，只有站到最后的人才能出道。',
 }
 
 // ── 快捷操作 ─────────────────────────────────────────

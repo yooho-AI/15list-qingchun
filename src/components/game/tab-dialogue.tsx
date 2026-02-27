@@ -71,8 +71,6 @@ function EpisodeCard({ msg }: { msg: Message }) {
 function LetterCard() {
   return (
     <div className={`${P}-letter-card`}>
-      <div className={`${P}-letter-emoji`}>{STORY_INFO.emoji}</div>
-      <div className={`${P}-letter-genre`}>{STORY_INFO.genre}</div>
       <div className={`${P}-letter-title`}>{STORY_INFO.title}</div>
       <p className={`${P}-letter-desc`}>{STORY_INFO.description}</p>
     </div>

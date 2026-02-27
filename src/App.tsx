@@ -188,14 +188,13 @@ function CharacterMontage({ onComplete }: { onComplete: () => void }) {
   )
 }
 
-// ── Phase 3: 姓名输入 ────────────────────────────────
+// ── Phase 3: 姓名输入（暗色通行证） ─────────────────
 function NameInput() {
   const [name, setName] = useState('')
   const setPlayerInfo = useGameStore((s) => s.setPlayerInfo)
   const initGame = useGameStore((s) => s.initGame)
   const loadGame = useGameStore((s) => s.loadGame)
   const hasSave = useGameStore((s) => s.hasSave)
-
   const sendMessage = useGameStore((s) => s.sendMessage)
 
   const handleStart = useCallback(() => {
@@ -204,7 +203,6 @@ function NameInput() {
     initGame()
     trackGameStart()
     trackPlayerCreate(name.trim())
-    // 自动发送第一条消息，让 AI 立即生成开场叙事
     setTimeout(() => {
       sendMessage('（推开天星传媒的大门，深吸一口气，我来报到了。）')
     }, 300)
@@ -220,55 +218,53 @@ function NameInput() {
   return (
     <div className="qc-start-bg">
       <motion.div
-        className="qc-start-card"
+        className="qc-start-inner"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div style={{ fontSize: 56, marginBottom: 8 }}>{STORY_INFO.emoji}</div>
-        <div className="qc-letter-genre">{STORY_INFO.genre}</div>
-        <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>
-          {STORY_INFO.title}
-        </h1>
-        <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20, lineHeight: 1.6 }}>
-          {STORY_INFO.description}
-        </p>
+        <div className="qc-start-logo">TIANXING MEDIA</div>
+        <h1 className="qc-start-title">练习生通行证</h1>
+        <p className="qc-start-desc">{STORY_INFO.description}</p>
 
-        {/* 男主预览：真实立绘头像 */}
-        <div className="qc-preview-grid">
-          {leads.map((c) => (
-            <div key={c.id} className="qc-preview-card">
-              <img className="qc-preview-avatar" src={c.portrait} alt={c.name} />
-              <div className="qc-preview-name">{c.name}</div>
-              <div className="qc-preview-title">{c.title}</div>
-            </div>
+        {/* 3 男主竖卡 */}
+        <div className="qc-start-leads">
+          {leads.map((c, i) => (
+            <motion.div
+              key={c.id}
+              className="qc-start-lead"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + i * 0.12 }}
+            >
+              <img src={c.portrait} alt={c.name} />
+              <div className="qc-start-lead-info">
+                <div className="qc-start-lead-name">{c.name}</div>
+                <div className="qc-start-lead-title">{c.title}</div>
+              </div>
+            </motion.div>
           ))}
         </div>
 
-        {/* 名字输入 */}
         <input
           className="qc-start-input"
-          placeholder="输入你的艺名（最多8字）"
+          placeholder="你的艺名"
           value={name}
           onChange={(e) => setName(e.target.value.slice(0, 8))}
           onKeyDown={(e) => e.key === 'Enter' && handleStart()}
         />
-
-        {/* 按钮 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 16 }}>
-          <button
-            className="qc-start-btn"
-            onClick={handleStart}
-            disabled={!name.trim()}
-          >
-            踏上星光之路
+        <button
+          className="qc-start-btn"
+          onClick={handleStart}
+          disabled={!name.trim()}
+        >
+          正式报到
+        </button>
+        {hasSave() && (
+          <button className="qc-start-btn-secondary" onClick={handleContinue}>
+            继续训练
           </button>
-          {hasSave() && (
-            <button className="qc-start-btn-secondary" onClick={handleContinue}>
-              继续游戏
-            </button>
-          )}
-        </div>
+        )}
       </motion.div>
     </div>
   )
