@@ -37,6 +37,8 @@ body {
   overflow: hidden;
 }
 
+#root { width: 100%; height: 100%; }
+
 /* ── Shell 容器 ───────────────────────────────────── */
 .qc-shell {
   display: flex;
