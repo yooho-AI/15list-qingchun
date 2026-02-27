@@ -144,13 +144,19 @@ function NameInput() {
   const loadGame = useGameStore((s) => s.loadGame)
   const hasSave = useGameStore((s) => s.hasSave)
 
+  const sendMessage = useGameStore((s) => s.sendMessage)
+
   const handleStart = useCallback(() => {
     if (!name.trim()) return
     setPlayerInfo(name.trim())
     initGame()
     trackGameStart()
     trackPlayerCreate(name.trim())
-  }, [name, setPlayerInfo, initGame])
+    // 自动发送第一条消息，让 AI 立即生成开场叙事
+    setTimeout(() => {
+      sendMessage('（推开天星传媒的大门，深吸一口气，我来报到了。）')
+    }, 300)
+  }, [name, setPlayerInfo, initGame, sendMessage])
 
   const handleContinue = useCallback(() => {
     loadGame()
