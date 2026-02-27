@@ -29,6 +29,10 @@ export interface Message {
   content: string
   character?: string
   timestamp: number
+  // 富消息扩展
+  type?: 'scene-transition' | 'episode-change'
+  sceneId?: string
+  episodeInfo?: { episode: number; chapter: string }
 }
 
 // ── 数值元数据 ────────────────────────────────────────

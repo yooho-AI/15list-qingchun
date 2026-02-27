@@ -15,6 +15,10 @@ import {
   SCENES, ITEMS, STORY_INFO, GLOBAL_STAT_METAS,
   buildCharacters, getCurrentChapter, getDayEvents,
 } from './data'
+import {
+  trackTimeAdvance, trackChapterEnter, trackEndingReached,
+  trackMentalCrisis, trackSceneUnlock,
+} from './analytics'
 import GAME_SCRIPT from './script.md?raw'
 
 // ── 常量 ─────────────────────────────────────────────
@@ -260,7 +264,26 @@ export const useGameStore = create<GameStore>()(
     },
 
     selectScene: (sceneId: string) => {
-      set((s) => { s.currentScene = sceneId })
+      const state = get()
+      if (!state.unlockedScenes.includes(sceneId)) return
+      const prevScene = state.currentScene
+      if (prevScene === sceneId) return
+
+      set((s) => {
+        s.currentScene = sceneId
+        // 富消息：场景转场卡
+        s.messages.push({
+          id: makeId(), role: 'system', content: '',
+          timestamp: Date.now(),
+          type: 'scene-transition', sceneId,
+        })
+        s.activeTab = 'dialogue'
+      })
+
+      // 首次解锁追踪
+      if (!state.unlockedScenes.includes(sceneId)) {
+        trackSceneUnlock(sceneId)
+      }
     },
 
     setActiveTab: (tab) => {
@@ -333,7 +356,8 @@ export const useGameStore = create<GameStore>()(
 
         set((s) => {
           s.messages.push({
-            id: makeId(), role: 'assistant', content: fullContent, timestamp: Date.now(),
+            id: makeId(), role: 'assistant', content: fullContent,
+            character: s.currentCharacter ?? undefined, timestamp: Date.now(),
           })
           s.isTyping = false
           s.streamingContent = ''
@@ -348,6 +372,7 @@ export const useGameStore = create<GameStore>()(
     },
 
     advanceTime: () => {
+      let dayChanged = false
       set((s) => {
         s.actionPoints -= 1
         s.currentPeriodIndex += 1
@@ -356,6 +381,7 @@ export const useGameStore = create<GameStore>()(
           s.currentPeriodIndex = 0
           s.currentDay += 1
           s.actionPoints = MAX_ACTION_POINTS
+          dayChanged = true
 
           // 心理自然消耗
           s.globalResources.mental = Math.max(0, s.globalResources.mental - 3)
@@ -364,19 +390,36 @@ export const useGameStore = create<GameStore>()(
           const newChapter = getCurrentChapter(s.currentDay)
           if (newChapter.id !== s.currentChapter) {
             s.currentChapter = newChapter.id
+            trackChapterEnter(newChapter.id)
           }
 
           // 场景解锁
           if (s.currentDay >= 4 && !s.unlockedScenes.includes('stage')) {
             s.unlockedScenes.push('stage')
+            trackSceneUnlock('stage')
           }
         }
       })
 
       const state = get()
-      get().addSystemMessage(
-        `⏰ 第${state.currentDay}期 · ${PERIODS[state.currentPeriodIndex].name}`
-      )
+      trackTimeAdvance(state.currentDay, PERIODS[state.currentPeriodIndex].name)
+
+      // 换期：富消息替代系统消息
+      if (dayChanged) {
+        const chapter = getCurrentChapter(state.currentDay)
+        set((s) => {
+          s.messages.push({
+            id: makeId(), role: 'system', content: '',
+            timestamp: Date.now(),
+            type: 'episode-change',
+            episodeInfo: { episode: state.currentDay, chapter: chapter.name },
+          })
+        })
+      } else {
+        get().addSystemMessage(
+          `⏰ 第${state.currentDay}期 · ${PERIODS[state.currentPeriodIndex].name}`
+        )
+      }
 
       // 强制事件
       const events = getDayEvents(state.currentDay, state.triggeredEvents)
@@ -389,6 +432,7 @@ export const useGameStore = create<GameStore>()(
 
       // BE 检查：心理崩溃
       if (state.globalResources.mental <= 20) {
+        trackMentalCrisis(state.globalResources.mental)
         const avgSkill = (state.globalResources.vocal + state.globalResources.dance + state.globalResources.charm) / 3
         if (avgSkill < 40) {
           set((s) => { s.endingType = 'be-quit' })
@@ -441,13 +485,18 @@ export const useGameStore = create<GameStore>()(
       const { vocal, dance, charm, fans, mental } = s.globalResources
       const avgSkill = (vocal + dance + charm) / 3
 
+      const setEnding = (id: string) => {
+        set((st) => { st.endingType = id })
+        trackEndingReached(id)
+      }
+
       // BE
       if (mental <= 20) {
-        set((st) => { st.endingType = 'be-quit' })
+        setEnding('be-quit')
         return
       }
       if (avgSkill < 40) {
-        set((st) => { st.endingType = 'be-eliminated' })
+        setEnding('be-eliminated')
         return
       }
 
@@ -458,7 +507,7 @@ export const useGameStore = create<GameStore>()(
           .map(([, stats]) => stats.affection ?? 0)
       )
       if (vocal >= 75 && dance >= 75 && charm >= 75 && fans >= 80 && mental >= 60 && maxAffection >= 80) {
-        set((st) => { st.endingType = 'te-ace' })
+        setEnding('te-ace')
         return
       }
 
@@ -467,30 +516,30 @@ export const useGameStore = create<GameStore>()(
         .filter(([id]) => !s.characters[id]?.isLead)
         .map(([, stats]) => stats.friendship ?? 0)
       if (traineeFriendships.length > 0 && traineeFriendships.every((f) => f >= 70) && avgSkill >= 60) {
-        set((st) => { st.endingType = 'te-pure' })
+        setEnding('te-pure')
         return
       }
 
       // HE: Solo新星
       if ((vocal >= 85 || dance >= 85) && fans < 50) {
-        set((st) => { st.endingType = 'he-solo' })
+        setEnding('he-solo')
         return
       }
 
       // HE: 梦想成真
       if (fans >= 60 && avgSkill >= 55 && mental >= 50) {
-        set((st) => { st.endingType = 'he-debut' })
+        setEnding('he-debut')
         return
       }
 
       // NE: 黑红出道
       if (fans >= 70 && mental < 40) {
-        set((st) => { st.endingType = 'ne-blackred' })
+        setEnding('ne-blackred')
         return
       }
 
       // NE: 意难平
-      set((st) => { st.endingType = 'ne-close' })
+      setEnding('ne-close')
     },
 
     addSystemMessage: (content: string) => {
@@ -596,4 +645,5 @@ export {
 export type {
   Character, CharacterStats, Scene, GameItem, Chapter,
   ForcedEvent, Ending, TimePeriod, StatMeta, GlobalResources,
+  Message,
 } from '@/lib/data'

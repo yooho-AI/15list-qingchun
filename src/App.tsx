@@ -1,17 +1,21 @@
 /**
- * [INPUT]: 依赖 store.ts 全局状态，bgm.ts 音频，data.ts 类型
+ * [INPUT]: 依赖 store.ts 全局状态，bgm.ts 音频，data.ts 类型+角色数据，analytics.ts 埋点
  * [OUTPUT]: 对外提供 App 根组件
- * [POS]: 应用入口，StartScreen ↔ GameScreen 二态 + EndingModal + MenuOverlay
+ * [POS]: 应用入口，三阶段开场(邀请函→群像闪切→姓名输入) ↔ GameScreen + EndingModal + MenuOverlay
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useGameStore } from '@/lib/store'
 import { STORY_INFO, ENDINGS } from '@/lib/store'
+import { buildCharacters } from '@/lib/data'
 import { useBgm } from '@/lib/bgm'
+import { trackGameStart, trackPlayerCreate, trackGameContinue } from '@/lib/analytics'
 import AppShell from '@/components/game/app-shell'
 import '@/styles/globals.css'
+import '@/styles/opening.css'
+import '@/styles/rich-cards.css'
 
 // ── 结局类型映射（数据驱动，零 if/else） ────────────
 const ENDING_TYPE_MAP: Record<string, { label: string; color: string; icon: string }> = {
@@ -21,10 +25,120 @@ const ENDING_TYPE_MAP: Record<string, { label: string; color: string; icon: stri
   NE: { label: '🌙 Normal Ending', color: '#f59e0b', icon: '🌙' },
 }
 
-// ── 开始页面 ─────────────────────────────────────────
-function StartScreen() {
+// ── 角色数据（群像闪切用） ───────────────────────────
+const ALL_CHARACTERS = Object.values(buildCharacters())
+
+// ── Phase 1: 邀请函 ─────────────────────────────────
+function InviteCard({ onConfirm }: { onConfirm: () => void }) {
+  return (
+    <div className="qc-start-bg">
+      <motion.div
+        className="qc-invite-card"
+        initial={{ opacity: 0, scale: 0.92, y: 30 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ type: 'spring', damping: 20, stiffness: 200 }}
+      >
+        <div className="qc-invite-logo">TIANXING MEDIA</div>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>⭐</div>
+        <h1 className="qc-invite-title">练习生选拔通知</h1>
+        <p className="qc-invite-body">
+          恭喜你通过天星传媒练习生初选。<br />
+          即日起，请前往公司报到，开启你的偶像之路。<br />
+          12期综艺考核，决定你的出道命运。
+        </p>
+        <div className="qc-invite-seal">天星传媒 · 练习生事业部</div>
+        <motion.button
+          className="qc-invite-cta"
+          onClick={onConfirm}
+          whileTap={{ scale: 0.97 }}
+        >
+          确认入社
+        </motion.button>
+      </motion.div>
+    </div>
+  )
+}
+
+// ── Phase 2: 群像闪切 ────────────────────────────────
+function CharacterMontage({ onComplete }: { onComplete: () => void }) {
+  const [index, setIndex] = useState(0)
+  const { toggle, isPlaying } = useBgm()
+
+  // BGM 启动
+  useEffect(() => {
+    if (!isPlaying) toggle()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 自动推进
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (index < ALL_CHARACTERS.length) {
+        setIndex((i) => i + 1)
+      } else {
+        onComplete()
+      }
+    }, 2000)
+    return () => clearTimeout(timer)
+  }, [index, onComplete])
+
+  const char = ALL_CHARACTERS[index]
+  const fromLeft = index % 2 === 0
+
+  return (
+    <div className="qc-start-bg" style={{ padding: 0 }}>
+      <div style={{ maxWidth: 430, width: '100%', height: '100dvh', position: 'relative', overflow: 'hidden', background: '#0f0f0f' }}>
+        <AnimatePresence mode="wait">
+          {char ? (
+            <motion.div
+              key={char.id}
+              className="qc-montage-portrait"
+              initial={{ opacity: 0, x: fromLeft ? -60 : 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+            >
+              <img src={char.portrait} alt={char.name} />
+              <div className="qc-montage-overlay">
+                <div className="qc-montage-name">{char.name}</div>
+                <div className="qc-montage-title">{char.title}</div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="empty"
+              className="qc-montage-empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <div style={{ fontSize: 56 }}>?</div>
+              <div className="qc-montage-empty-text">你的位置</div>
+              <div className="qc-montage-empty-sub">等你来占</div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 进度点 */}
+        <div className="qc-montage-dots">
+          {[...ALL_CHARACTERS, null].map((_, i) => (
+            <div
+              key={i}
+              className={`qc-montage-dot ${i === index ? 'qc-montage-dot-active' : ''}`}
+            />
+          ))}
+        </div>
+
+        {/* 跳过按钮 */}
+        <button className="qc-montage-skip" onClick={onComplete}>
+          跳过
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ── Phase 3: 姓名输入 ────────────────────────────────
+function NameInput() {
   const [name, setName] = useState('')
-  const { isPlaying, toggle } = useBgm()
   const setPlayerInfo = useGameStore((s) => s.setPlayerInfo)
   const initGame = useGameStore((s) => s.initGame)
   const loadGame = useGameStore((s) => s.loadGame)
@@ -34,17 +148,16 @@ function StartScreen() {
     if (!name.trim()) return
     setPlayerInfo(name.trim())
     initGame()
+    trackGameStart()
+    trackPlayerCreate(name.trim())
   }, [name, setPlayerInfo, initGame])
 
   const handleContinue = useCallback(() => {
     loadGame()
+    trackGameContinue()
   }, [loadGame])
 
-  const characters = [
-    { name: '顾言澈', title: '顶流男明星', color: '#6366f1' },
-    { name: '沈哲远', title: '舞蹈导师', color: '#ef4444' },
-    { name: '周慕深', title: '王牌经纪人', color: '#0ea5e9' },
-  ]
+  const leads = ALL_CHARACTERS.filter((c) => c.isLead)
 
   return (
     <div className="qc-start-bg">
@@ -63,18 +176,11 @@ function StartScreen() {
           {STORY_INFO.description}
         </p>
 
-        {/* 角色预览 */}
+        {/* 男主预览：真实立绘头像 */}
         <div className="qc-preview-grid">
-          {characters.map((c) => (
-            <div key={c.name} className="qc-preview-card">
-              <div style={{
-                width: 48, height: 48, borderRadius: '50%',
-                background: `linear-gradient(135deg, ${c.color}22, ${c.color}44)`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 20, border: `2px solid ${c.color}33`,
-              }}>
-                {c.name[0]}
-              </div>
+          {leads.map((c) => (
+            <div key={c.id} className="qc-preview-card">
+              <img className="qc-preview-avatar" src={c.portrait} alt={c.name} />
               <div className="qc-preview-name">{c.name}</div>
               <div className="qc-preview-title">{c.title}</div>
             </div>
@@ -105,19 +211,33 @@ function StartScreen() {
             </button>
           )}
         </div>
-
-        {/* 音乐控制 */}
-        <button
-          onClick={toggle}
-          style={{
-            marginTop: 16, background: 'none', border: 'none',
-            cursor: 'pointer', fontSize: 20, opacity: 0.5,
-          }}
-        >
-          {isPlaying ? '🔊' : '🔇'}
-        </button>
       </motion.div>
     </div>
+  )
+}
+
+// ── 开场路由 ─────────────────────────────────────────
+function StartScreen() {
+  const [phase, setPhase] = useState<'invite' | 'montage' | 'input'>('invite')
+
+  return (
+    <AnimatePresence mode="wait">
+      {phase === 'invite' && (
+        <motion.div key="invite" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+          <InviteCard onConfirm={() => setPhase('montage')} />
+        </motion.div>
+      )}
+      {phase === 'montage' && (
+        <motion.div key="montage" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+          <CharacterMontage onComplete={() => setPhase('input')} />
+        </motion.div>
+      )}
+      {phase === 'input' && (
+        <motion.div key="input" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <NameInput />
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 

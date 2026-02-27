@@ -1,7 +1,7 @@
 /**
  * [INPUT]: 依赖 store.ts 状态（场景/角色/解锁），data.ts 场景常量
  * [OUTPUT]: 对外提供 TabScene 组件
- * [POS]: 场景 Tab：场景大图(9:16) + 描述 + 相关人物 + 地点列表
+ * [POS]: 场景 Tab：场景大图(9:16) + 描述 + 相关人物(真实头像) + 地点列表
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
@@ -59,7 +59,7 @@ export default function TabScene() {
         </p>
       )}
 
-      {/* ── 相关人物 ── */}
+      {/* ── 相关人物（真实头像） ── */}
       <h4 style={{
         fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)',
         marginBottom: 8, paddingLeft: 4,
@@ -74,15 +74,16 @@ export default function TabScene() {
             onClick={() => handleCharClick(id)}
             style={{ flex: 'none' }}
           >
-            <div style={{
-              width: 32, height: 32, borderRadius: '50%',
-              background: `linear-gradient(135deg, ${char.themeColor}22, ${char.themeColor}44)`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 14, border: `2px solid ${char.themeColor}33`,
-              flexShrink: 0,
-            }}>
-              {char.name[0]}
-            </div>
+            <img
+              src={char.portrait}
+              alt={char.name}
+              style={{
+                width: 32, height: 32, borderRadius: '50%',
+                objectFit: 'cover', objectPosition: 'center top',
+                border: `2px solid ${char.themeColor}33`,
+                flexShrink: 0,
+              }}
+            />
             <span style={{ fontSize: 13, fontWeight: 500 }}>{char.name}</span>
           </button>
         ))}

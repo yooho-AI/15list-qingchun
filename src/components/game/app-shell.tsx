@@ -1,10 +1,11 @@
 /**
  * [INPUT]: 依赖 store.ts 状态，bgm.ts 音频，data.ts 常量
  * [OUTPUT]: 对外提供 AppShell 组件
- * [POS]: 游戏主框架：Header + Tab 内容区 + TabBar。桌面 430px 居中壳。
+ * [POS]: 游戏主框架：Header(时间+属性+荧光棒音乐+菜单) + Tab 内容区 + TabBar。桌面 430px 居中壳。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGameStore, PERIODS, GLOBAL_STAT_METAS } from '@/lib/store'
 import type { GlobalResources } from '@/lib/store'
@@ -21,6 +22,51 @@ const TAB_CONFIG = [
   { key: 'character', icon: '👤', label: '人物' },
 ] as const
 
+// ── 荧光棒音乐播放器 ────────────────────────────────
+function MusicPlayer() {
+  const { isPlaying, toggle } = useBgm()
+  const [showPanel, setShowPanel] = useState(false)
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <button
+        className={`${P}-music-btn`}
+        onClick={() => setShowPanel(!showPanel)}
+      >
+        <div className={`${P}-glowstick ${isPlaying ? `${P}-glowstick-playing` : ''}`} />
+      </button>
+
+      <AnimatePresence>
+        {showPanel && (
+          <motion.div
+            className={`${P}-music-panel`}
+            initial={{ opacity: 0, y: -8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className={`${P}-music-title`}>
+              {isPlaying ? '♫ 正在播放' : '♫ 已暂停'}
+            </div>
+            <div className={`${P}-wave-container`}>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div
+                  key={i}
+                  className={`${P}-wave-bar ${P}-wave-bar-${i} ${!isPlaying ? `${P}-wave-bar-paused` : ''}`}
+                />
+              ))}
+            </div>
+            <button className={`${P}-music-toggle`} onClick={toggle}>
+              {isPlaying ? '暂停' : '播放'}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// ── AppShell ─────────────────────────────────────────
 interface AppShellProps {
   onMenuOpen: () => void
 }
@@ -31,7 +77,6 @@ export default function AppShell({ onMenuOpen }: AppShellProps) {
   const globalResources = useGameStore((s) => s.globalResources)
   const activeTab = useGameStore((s) => s.activeTab)
   const setActiveTab = useGameStore((s) => s.setActiveTab)
-  const { isPlaying, toggle } = useBgm()
 
   const period = PERIODS[currentPeriodIndex]
 
@@ -73,9 +118,7 @@ export default function AppShell({ onMenuOpen }: AppShellProps) {
               </span>
             </div>
           ))}
-          <button className={`${P}-header-btn`} onClick={toggle}>
-            {isPlaying ? '🔊' : '🔇'}
-          </button>
+          <MusicPlayer />
           <button className={`${P}-header-btn`} onClick={onMenuOpen}>
             ☰
           </button>

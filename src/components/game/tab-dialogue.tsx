@@ -1,16 +1,58 @@
 /**
- * [INPUT]: 依赖 store.ts 状态和操作，parser.ts 文本解析，data.ts 道具/快捷操作
+ * [INPUT]: 依赖 store.ts 状态和操作，parser.ts 文本解析，data.ts 道具/快捷操作/场景
  * [OUTPUT]: 对外提供 TabDialogue 组件
- * [POS]: 对话 Tab：聊天气泡 + 快捷操作 + 背包 + 输入框
+ * [POS]: 对话 Tab：富消息路由(场景卡/期变卡/NPC头像气泡/系统/玩家) + 快捷操作 + 背包 + 输入
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useGameStore, STORY_INFO, ITEMS, QUICK_ACTIONS } from '@/lib/store'
+import { useGameStore, STORY_INFO, ITEMS, QUICK_ACTIONS, SCENES } from '@/lib/store'
+import type { Message } from '@/lib/store'
 import { parseStoryParagraph } from '@/lib/parser'
 
 const P = 'qc'
+
+// ── 场景转场卡 ───────────────────────────────────────
+function SceneTransitionCard({ msg }: { msg: Message }) {
+  const scene = msg.sceneId ? SCENES[msg.sceneId] : null
+  if (!scene) return null
+
+  return (
+    <motion.div
+      className={`${P}-scene-card`}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      <img src={scene.background} alt={scene.name} loading="lazy" />
+      <div className={`${P}-scene-card-overlay`}>
+        <div className={`${P}-scene-card-name`}>{scene.icon} {scene.name}</div>
+        <div className={`${P}-scene-card-atmo`}>{scene.atmosphere}</div>
+      </div>
+      <div className={`${P}-scene-card-badge`}>当前位置</div>
+    </motion.div>
+  )
+}
+
+// ── 期变卡片 ─────────────────────────────────────────
+function EpisodeCard({ msg }: { msg: Message }) {
+  const info = msg.episodeInfo
+  if (!info) return null
+
+  return (
+    <motion.div
+      className={`${P}-episode-card`}
+      initial={{ opacity: 0, y: -30, rotate: -3 }}
+      animate={{ opacity: 1, y: 0, rotate: 0 }}
+      transition={{ type: 'spring', damping: 18, stiffness: 250 }}
+    >
+      <div className={`${P}-episode-badge`}>EPISODE</div>
+      <div className={`${P}-episode-number`}>第{info.episode}期</div>
+      <div className={`${P}-episode-chapter`}>{info.chapter}</div>
+    </motion.div>
+  )
+}
 
 // ── 信笺卡片 ─────────────────────────────────────────
 function LetterCard() {
@@ -106,6 +148,70 @@ function InventorySheet({ onClose }: { onClose: () => void }) {
   )
 }
 
+// ── 消息气泡路由 ─────────────────────────────────────
+function MessageBubble({ msg }: { msg: Message }) {
+  const characters = useGameStore((s) => s.characters)
+
+  // 富消息路由
+  if (msg.type === 'scene-transition') return <SceneTransitionCard msg={msg} />
+  if (msg.type === 'episode-change') return <EpisodeCard msg={msg} />
+
+  // 系统消息
+  if (msg.role === 'system') {
+    return (
+      <motion.div
+        className={`${P}-bubble-system`}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        {msg.content}
+      </motion.div>
+    )
+  }
+
+  // 玩家消息
+  if (msg.role === 'user') {
+    return (
+      <motion.div
+        className={`${P}-bubble-player`}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        {msg.content}
+      </motion.div>
+    )
+  }
+
+  // NPC 消息：头像 + 气泡
+  const char = msg.character ? characters[msg.character] : null
+  const { narrative, statHtml } = parseStoryParagraph(msg.content)
+
+  return (
+    <motion.div
+      className={`${P}-npc-row`}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      {char ? (
+        <img className={`${P}-npc-avatar`} src={char.portrait} alt={char.name} />
+      ) : (
+        <div style={{
+          width: 28, height: 28, borderRadius: '50%',
+          background: 'var(--primary-light)', flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 12, color: 'var(--primary)',
+        }}>
+          AI
+        </div>
+      )}
+      <div className={`${P}-npc-bubble`}>
+        <div dangerouslySetInnerHTML={{ __html: narrative }} />
+        {statHtml && <div dangerouslySetInnerHTML={{ __html: statHtml }} />}
+      </div>
+    </motion.div>
+  )
+}
+
 // ── 对话 Tab 主组件 ──────────────────────────────────
 export default function TabDialogue() {
   const messages = useGameStore((s) => s.messages)
@@ -120,7 +226,7 @@ export default function TabDialogue() {
   const [showInventory, setShowInventory] = useState(false)
   const chatRef = useRef<HTMLDivElement>(null)
 
-  // 自动滚动到底部
+  // 自动滚动
   useEffect(() => {
     if (chatRef.current) {
       chatRef.current.scrollTop = chatRef.current.scrollHeight
@@ -154,44 +260,9 @@ export default function TabDialogue() {
       >
         {messages.length === 0 && <LetterCard />}
 
-        {messages.map((msg) => {
-          if (msg.role === 'system') {
-            return (
-              <motion.div
-                key={msg.id}
-                className={`${P}-bubble-system`}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                {msg.content}
-              </motion.div>
-            )
-          }
-          if (msg.role === 'user') {
-            return (
-              <motion.div
-                key={msg.id}
-                className={`${P}-bubble-player`}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                {msg.content}
-              </motion.div>
-            )
-          }
-          const { narrative, statHtml } = parseStoryParagraph(msg.content)
-          return (
-            <motion.div
-              key={msg.id}
-              className={`${P}-bubble-npc`}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <div dangerouslySetInnerHTML={{ __html: narrative }} />
-              {statHtml && <div dangerouslySetInnerHTML={{ __html: statHtml }} />}
-            </motion.div>
-          )
-        })}
+        {messages.map((msg) => (
+          <MessageBubble key={msg.id} msg={msg} />
+        ))}
 
         {isTyping && !streamingContent && <TypingIndicator />}
         {streamingContent && <StreamingMessage content={streamingContent} />}
