@@ -16,8 +16,8 @@ import TabCharacter from './tab-character'
 const P = 'qc'
 
 const TAB_CONFIG = [
-  { key: 'dialogue', icon: '💬', label: '对话' },
   { key: 'scene', icon: '🗺️', label: '场景' },
+  { key: 'dialogue', icon: '💬', label: '对话' },
   { key: 'character', icon: '👤', label: '人物' },
 ] as const
 
