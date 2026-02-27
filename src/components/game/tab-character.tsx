@@ -1,7 +1,7 @@
 /**
  * [INPUT]: 依赖 store.ts 状态（角色/数值），data.ts 角色/工具函数
  * [OUTPUT]: 对外提供 TabCharacter 组件
- * [POS]: 人物 Tab：立绘(9:16) + 数值条(category分组) + 关系列表(真实头像) + CharacterDossier 全屏档案
+ * [POS]: 人物 Tab：立绘(9:16) + 数值条(category分组) + SVG RelationGraph + 关系列表(真实头像) + CharacterDossier 全屏档案
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
@@ -146,6 +146,122 @@ function CharacterDossier({ char, stats, onClose }: {
   )
 }
 
+// ── SVG 关系图常量 ───────────────────────────────────
+const W = 380, H = 300, CX = 190, CY = 150, R = 105, NODE_R = 22
+
+const STATIC_RELATIONS: Record<string, string> = {
+  guyanche: '声乐导师', shenzheyuan: '舞蹈搭档', zhoumushen: '经纪人',
+  linshiyu: '同期', zhaoxiaoman: '同期', chenkeer: '同期', suniannian: '同期',
+}
+
+function RelationGraph({ onSelectChar }: {
+  onSelectChar: (id: string) => void
+}) {
+  const characters = useGameStore((s) => s.characters)
+  const characterStats = useGameStore((s) => s.characterStats)
+  const currentCharacter = useGameStore((s) => s.currentCharacter)
+
+  const entries = Object.entries(characters)
+  const count = entries.length
+
+  return (
+    <div className={`${P}-relation-svg`}>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="auto">
+        {/* 连接线 */}
+        {entries.map(([id], i) => {
+          const angle = (2 * Math.PI * i) / count - Math.PI / 2
+          const nx = CX + R * Math.cos(angle)
+          const ny = CY + R * Math.sin(angle)
+          const isSelected = id === currentCharacter
+          return (
+            <line
+              key={`line-${id}`}
+              x1={CX} y1={CY} x2={nx} y2={ny}
+              stroke={isSelected ? characters[id].themeColor : '#e2e8f0'}
+              strokeWidth={isSelected ? 2 : 1}
+              strokeDasharray={isSelected ? 'none' : '4 3'}
+            />
+          )
+        })}
+
+        {/* 中点关系标签 */}
+        {entries.map(([id, char], i) => {
+          const angle = (2 * Math.PI * i) / count - Math.PI / 2
+          const mx = CX + (R * 0.55) * Math.cos(angle)
+          const my = CY + (R * 0.55) * Math.sin(angle)
+          const stats = characterStats[id]
+          const firstMeta = char.statMetas[0]
+          const val = firstMeta ? (stats?.[firstMeta.key] ?? 0) : 0
+          const label = STATIC_RELATIONS[id] ?? ''
+          const stage = getRelationStage(char.isLead, val)
+
+          return (
+            <g key={`label-${id}`}>
+              <rect
+                x={mx - 22} y={my - 8} width={44} height={16} rx={4}
+                fill="white" stroke="#e2e8f0" strokeWidth={0.5}
+              />
+              <text
+                x={mx} y={my + 3}
+                textAnchor="middle" fontSize={8} fill="#64748b"
+              >
+                {id === currentCharacter ? stage : label}
+              </text>
+            </g>
+          )
+        })}
+
+        {/* 中心节点 */}
+        <circle cx={CX} cy={CY} r={NODE_R + 4} fill="none" stroke="var(--primary)" strokeWidth={1} opacity={0.3} />
+        <circle cx={CX} cy={CY} r={NODE_R} fill="var(--primary)" />
+        <text x={CX} y={CY + 4} textAnchor="middle" fontSize={12} fill="white" fontWeight={600}>我</text>
+
+        {/* NPC 节点 */}
+        {entries.map(([id, char], i) => {
+          const angle = (2 * Math.PI * i) / count - Math.PI / 2
+          const nx = CX + R * Math.cos(angle)
+          const ny = CY + R * Math.sin(angle)
+          const isSelected = id === currentCharacter
+          const clipId = `clip-${id}`
+
+          return (
+            <g
+              key={`node-${id}`}
+              style={{ cursor: 'pointer' }}
+              onClick={() => onSelectChar(id)}
+            >
+              <defs>
+                <clipPath id={clipId}>
+                  <circle cx={nx} cy={ny} r={NODE_R} />
+                </clipPath>
+              </defs>
+              <circle
+                cx={nx} cy={ny} r={NODE_R + 2}
+                fill="none"
+                stroke={isSelected ? char.themeColor : '#e2e8f0'}
+                strokeWidth={isSelected ? 2.5 : 1.5}
+              />
+              <image
+                href={char.portrait}
+                x={nx - NODE_R} y={ny - NODE_R}
+                width={NODE_R * 2} height={NODE_R * 2}
+                clipPath={`url(#${clipId})`}
+                preserveAspectRatio="xMidYMin slice"
+              />
+              <text
+                x={nx} y={ny + NODE_R + 12}
+                textAnchor="middle" fontSize={10} fill="var(--text-secondary)"
+              >
+                {char.name}
+              </text>
+            </g>
+          )
+        })}
+      </svg>
+    </div>
+  )
+}
+
 // ── 分组标签 ──────────────────────────────────────────
 const CATEGORY_LABELS: Record<string, string> = {
   relation: '🤝 关系',
@@ -280,13 +396,21 @@ export default function TabCharacter() {
         </div>
       )}
 
-      {/* ── 关系总览（真实头像） ── */}
+      {/* ── SVG 关系图 ── */}
       <h4 style={{
         fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)',
         marginBottom: 8, paddingLeft: 4,
       }}>
         💕 角色关系
       </h4>
+      <RelationGraph
+        onSelectChar={(id) => {
+          selectCharacter(id)
+          setDossierChar(id)
+        }}
+      />
+
+      {/* ── 关系列表（真实头像） ── */}
       <div className={`${P}-relation-graph`}>
         {sorted.map(([id, c]) => {
           const cStats = characterStats[id]

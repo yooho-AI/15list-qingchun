@@ -1,7 +1,7 @@
 /**
  * [INPUT]: 依赖 zustand/immer 状态管理，stream.ts SSE 通信，data.ts 全部类型和常量，script.md 剧本原文
- * [OUTPUT]: 对外提供 useGameStore hook，re-export data.ts 全部导出
- * [POS]: lib 的状态中枢，被所有组件消费。剧本直通管道的终点。
+ * [OUTPUT]: 对外提供 useGameStore hook + StoryRecord 类型，re-export data.ts 全部导出
+ * [POS]: lib 的状态中枢，被所有组件消费。剧本直通管道的终点。抽屉状态(Dashboard/RecordSheet)宿主。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
@@ -20,6 +20,11 @@ import {
   trackMentalCrisis, trackSceneUnlock,
 } from './analytics'
 import GAME_SCRIPT from './script.md?raw'
+
+// ── 事件记录 ─────────────────────────────────────────
+export interface StoryRecord {
+  id: string; day: number; period: string; title: string; content: string
+}
 
 // ── 常量 ─────────────────────────────────────────────
 const SAVE_KEY = 'qingchun-save-v1'
@@ -63,6 +68,9 @@ interface GameState {
 
   endingType: string | null
   activeTab: 'dialogue' | 'scene' | 'character'
+  showDashboard: boolean
+  showRecords: boolean
+  storyRecords: StoryRecord[]
 }
 
 interface GameActions {
@@ -76,6 +84,9 @@ interface GameActions {
   useItem: (itemId: string) => void
   checkEnding: () => void
   addSystemMessage: (content: string) => void
+  toggleDashboard: () => void
+  toggleRecords: () => void
+  addStoryRecord: (title: string, content: string) => void
   resetGame: () => void
   saveGame: () => void
   loadGame: () => void
@@ -221,6 +232,9 @@ export const useGameStore = create<GameStore>()(
 
     endingType: null,
     activeTab: 'dialogue',
+    showDashboard: false,
+    showRecords: false,
+    storyRecords: [],
 
     // ── Actions ──
     setPlayerInfo: (name: string) => {
@@ -252,6 +266,9 @@ export const useGameStore = create<GameStore>()(
         s.historySummary = ''
         s.endingType = null
         s.activeTab = 'dialogue'
+        s.showDashboard = false
+        s.showRecords = false
+        s.storyRecords = []
       })
 
       get().addSystemMessage(
@@ -260,7 +277,10 @@ export const useGameStore = create<GameStore>()(
     },
 
     selectCharacter: (charId: string) => {
-      set((s) => { s.currentCharacter = charId })
+      set((s) => {
+        s.currentCharacter = charId
+        s.activeTab = 'dialogue'
+      })
     },
 
     selectScene: (sceneId: string) => {
@@ -354,6 +374,10 @@ export const useGameStore = create<GameStore>()(
           }
         })
 
+        const charName = get().currentCharacter
+          ? get().characters[get().currentCharacter!]?.name
+          : null
+
         set((s) => {
           s.messages.push({
             id: makeId(), role: 'assistant', content: fullContent,
@@ -363,6 +387,7 @@ export const useGameStore = create<GameStore>()(
           s.streamingContent = ''
         })
 
+        get().addStoryRecord(charName ?? '旁白', fullContent.slice(0, 30))
         get().advanceTime()
         get().saveGame()
       } catch {
@@ -415,6 +440,7 @@ export const useGameStore = create<GameStore>()(
             episodeInfo: { episode: state.currentDay, chapter: chapter.name },
           })
         })
+        get().addStoryRecord('期变', `进入第${state.currentDay}期`)
       } else {
         get().addSystemMessage(
           `⏰ 第${state.currentDay}期 · ${PERIODS[state.currentPeriodIndex].name}`
@@ -550,6 +576,33 @@ export const useGameStore = create<GameStore>()(
       })
     },
 
+    toggleDashboard: () => {
+      set((s) => {
+        s.showDashboard = !s.showDashboard
+        if (s.showDashboard) s.showRecords = false
+      })
+    },
+
+    toggleRecords: () => {
+      set((s) => {
+        s.showRecords = !s.showRecords
+        if (s.showRecords) s.showDashboard = false
+      })
+    },
+
+    addStoryRecord: (title: string, content: string) => {
+      const state = get()
+      set((s) => {
+        s.storyRecords.push({
+          id: makeId(),
+          day: state.currentDay,
+          period: PERIODS[state.currentPeriodIndex]?.name ?? '',
+          title,
+          content,
+        })
+      })
+    },
+
     resetGame: () => {
       set((s) => {
         s.gameStarted = false
@@ -565,6 +618,9 @@ export const useGameStore = create<GameStore>()(
         s.globalResources = { vocal: 30, dance: 25, charm: 40, fans: 5, mental: 70 }
         s.inventory = { 'lucky-charm': 1 }
         s.triggeredEvents = []
+        s.showDashboard = false
+        s.showRecords = false
+        s.storyRecords = []
       })
     },
 
@@ -589,6 +645,7 @@ export const useGameStore = create<GameStore>()(
         historySummary: s.historySummary,
         endingType: s.endingType,
         activeTab: s.activeTab,
+        storyRecords: s.storyRecords.slice(-50),
       }
       localStorage.setItem(SAVE_KEY, JSON.stringify(data))
     },
@@ -618,6 +675,7 @@ export const useGameStore = create<GameStore>()(
           s.historySummary = data.historySummary
           s.endingType = data.endingType
           s.activeTab = data.activeTab ?? 'dialogue'
+          s.storyRecords = data.storyRecords ?? []
         })
       } catch { /* 损坏的存档忽略 */ }
     },

@@ -35,10 +35,12 @@ function SceneTransitionCard({ msg }: { msg: Message }) {
   )
 }
 
-// ── 期变卡片 ─────────────────────────────────────────
+// ── 期变卡片（逐字打字机） ───────────────────────────
 function EpisodeCard({ msg }: { msg: Message }) {
   const info = msg.episodeInfo
   if (!info) return null
+
+  const text = `第${info.episode}期`
 
   return (
     <motion.div
@@ -48,7 +50,18 @@ function EpisodeCard({ msg }: { msg: Message }) {
       transition={{ type: 'spring', damping: 18, stiffness: 250 }}
     >
       <div className={`${P}-episode-badge`}>EPISODE</div>
-      <div className={`${P}-episode-number`}>第{info.episode}期</div>
+      <div className={`${P}-episode-number`}>
+        {text.split('').map((ch, i) => (
+          <motion.span
+            key={i}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + i * 0.08 }}
+          >
+            {ch}
+          </motion.span>
+        ))}
+      </div>
       <div className={`${P}-episode-chapter`}>{info.chapter}</div>
     </motion.div>
   )

@@ -4,10 +4,19 @@ L2 | 父级: /15list-qingchun/CLAUDE.md
 
 ## 成员清单
 
-- `app-shell.tsx`: 游戏主框架，Header(时间+属性+荧光棒MusicPlayer+菜单) + AnimatePresence Tab 切换 + 底部 TabBar(3 Tab)
-- `tab-dialogue.tsx`: 对话 Tab，富消息路由(SceneTransitionCard/EpisodeCard/NPC头像气泡/系统/玩家) + LetterCard + StreamingMessage + QuickActions(2×2) + InventorySheet + InputArea
+- `app-shell.tsx`: 游戏主框架，Header(📓+时间+属性+🎵+☰+📜) + 三向手势Tab切换 + 底部TabBar + DashboardDrawer(左抽屉) + RecordSheet(右抽屉) + Toast通知
+- `dashboard-drawer.tsx`: 练习生手帐，左侧滑入抽屉，7组件：FrontPage(期数+时段+章节+行动点)/CharacterGallery(立绘轮播+触摸滑动)/SceneMap(2×2网格)/TrainingGoals(章节目标+综合进度)/ItemBoard(道具格子)/RankingPreview(5属性mini条)/MusicSection(封面旋转+播控)。Reorder拖拽排序+localStorage持久化
+- `tab-dialogue.tsx`: 对话 Tab，富消息路由(SceneTransitionCard/EpisodeCard逐字打字机/NPC头像气泡/系统/玩家) + LetterCard + StreamingMessage + QuickActions(2×2) + InventorySheet + InputArea
 - `tab-scene.tsx`: 场景 Tab，SceneHeroCard(9:16大图) + 真实立绘头像人物标签 + 地点列表(解锁/锁定/当前)
-- `tab-character.tsx`: 人物 Tab，PortraitHero(9:16立绘) + 玩家属性面板 + NPC数值条(category分组) + 真实头像关系列表 + CharacterDossier 全屏右滑入档案卡(50vh立绘呼吸动画+好感阶段+触发暗示+可展开性格)
+- `tab-character.tsx`: 人物 Tab，PortraitHero(9:16立绘) + 玩家属性面板 + NPC数值条(category分组) + SVG RelationGraph(环形节点图+连线+关系标签) + 真实头像关系列表 + CharacterDossier全屏右滑入档案卡
+
+## 交互架构
+
+- **三向手势导航**：右滑→左侧手帐 | 左滑→右侧记录 | Header按钮同等触发
+- **手帐拖拽排序**：Reorder.Group + dragControls + 拖拽手柄(⋮⋮)，排序持久化localStorage
+- **人物轮播**：触摸滑动换人 + AnimatePresence方向动画 + 分页圆点
+- **SVG关系图**：中心"我"节点 + 7 NPC环形分布 + 立绘clipPath + 连线 + 关系标签，点击→selectCharacter+弹档案+跳对话Tab
+- **Toast通知**：saveGame 后弹出"✅ 已保存"，2s自动消失
 
 ## 设计约束
 
