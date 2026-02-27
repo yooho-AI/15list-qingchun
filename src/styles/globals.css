@@ -1,0 +1,861 @@
+@import 'tailwindcss';
+
+/* ── CSS 变量（亮色偶像主题） ─────────────────────── */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #fff0f5;
+  --bg-hover: rgba(255, 77, 141, 0.06);
+  --bg-active: rgba(255, 77, 141, 0.12);
+
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+
+  --border: rgba(255, 77, 141, 0.15);
+  --primary: #ff4d8d;
+  --primary-rgb: 255, 77, 141;
+  --primary-light: rgba(255, 77, 141, 0.08);
+  --primary-border: rgba(255, 77, 141, 0.25);
+  --accent: #6366f1;
+  --gold: #ffd700;
+
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 4px 16px rgba(255, 77, 141, 0.12);
+
+  --font: 'system-ui', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* ── 全局基础 ─────────────────────────────────────── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ── Shell 容器 ───────────────────────────────────── */
+.qc-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  width: 100%;
+  background: var(--bg-primary);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── 桌面居中容器 ─────────────────────────────────── */
+@media (min-width: 431px) {
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fff0f5, #fce7f3, #ede9fe);
+  }
+
+  .qc-shell {
+    max-width: 430px;
+    height: 100vh;
+    max-height: 932px;
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    box-shadow:
+      0 0 0 1px rgba(255, 77, 141, 0.05),
+      0 25px 50px rgba(0, 0, 0, 0.08),
+      0 0 120px rgba(255, 77, 141, 0.06);
+    overflow: hidden;
+  }
+}
+
+/* ── Header ───────────────────────────────────────── */
+.qc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  min-height: 44px;
+}
+
+.qc-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.qc-header-center {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.qc-header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qc-header-stat {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  padding: 2px 6px;
+  background: var(--bg-hover);
+  border-radius: 8px;
+}
+
+.qc-header-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.qc-header-btn:active {
+  background: var(--bg-active);
+}
+
+/* ── 底部 TabBar ──────────────────────────────────── */
+.qc-tab-bar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 56px;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom);
+  flex-shrink: 0;
+}
+
+.qc-tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 16px;
+  font-size: 10px;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.qc-tab-item span:first-child {
+  font-size: 20px;
+}
+
+.qc-tab-active {
+  color: var(--primary);
+}
+
+/* ── 通用卡片 ─────────────────────────────────────── */
+.qc-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s;
+}
+
+/* ── 对话 Tab 样式 ────────────────────────────────── */
+.qc-bubble-npc {
+  align-self: flex-start;
+  max-width: 85%;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-radius: 4px 16px 16px 16px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.qc-bubble-player {
+  align-self: flex-end;
+  max-width: 75%;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, var(--primary), #f472b6);
+  color: white;
+  border-radius: 16px 4px 16px 16px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.qc-bubble-system {
+  align-self: center;
+  padding: 6px 14px;
+  background: var(--bg-hover);
+  border-radius: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.qc-bubble-npc .dialogue-line {
+  margin-bottom: 4px;
+}
+
+.qc-bubble-npc .action {
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 4px;
+}
+
+.qc-bubble-npc .narration {
+  margin-bottom: 4px;
+}
+
+.qc-bubble-npc .stat-changes {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.qc-bubble-npc .stat-change {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.qc-bubble-npc .stat-up { color: #10b981; }
+.qc-bubble-npc .stat-down { color: #ef4444; }
+
+/* ── 快捷操作 ─────────────────────────────────────── */
+.qc-quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.qc-quick-btn {
+  padding: 8px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.qc-quick-btn:active {
+  background: var(--primary-light);
+  border-color: var(--primary-border);
+  color: var(--primary);
+}
+
+.qc-quick-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── 输入区 ───────────────────────────────────────── */
+.qc-input-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border);
+}
+
+.qc-input {
+  flex: 1;
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 14px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.qc-input:focus {
+  border-color: var(--primary);
+}
+
+.qc-input::placeholder {
+  color: var(--text-muted);
+}
+
+.qc-send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), #f472b6);
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s, opacity 0.2s;
+  flex-shrink: 0;
+}
+
+.qc-send-btn:active {
+  transform: scale(0.92);
+}
+
+.qc-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.qc-item-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.qc-item-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  background: var(--primary);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+/* ── 信笺卡片 ─────────────────────────────────────── */
+.qc-letter-card {
+  margin: 16px;
+  padding: 24px 20px;
+  background: linear-gradient(135deg, #fff0f5, #fce7f3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  text-align: center;
+}
+
+.qc-letter-emoji {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.qc-letter-genre {
+  font-size: 11px;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 2px 10px;
+  border-radius: 10px;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.qc-letter-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.qc-letter-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+/* ── 场景 Tab ─────────────────────────────────────── */
+.qc-scene-hero {
+  position: relative;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.qc-scene-hero img {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+}
+
+.qc-scene-hero-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 32px 16px 16px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+  color: white;
+}
+
+.qc-scene-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding: 0 4px;
+}
+
+.qc-location-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.qc-location-tag:active,
+.qc-location-active {
+  background: var(--primary-light);
+  border-color: var(--primary-border);
+}
+
+/* ── 人物 Tab ─────────────────────────────────────── */
+.qc-portrait-hero {
+  position: relative;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.qc-portrait-hero img {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+}
+
+.qc-stat-group {
+  margin-bottom: 12px;
+}
+
+.qc-stat-group-title {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  padding-left: 4px;
+  font-weight: 600;
+}
+
+.qc-stat-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.qc-stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  min-width: 60px;
+  white-space: nowrap;
+}
+
+.qc-stat-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.qc-stat-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease-out;
+}
+
+.qc-stat-value {
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 24px;
+  text-align: right;
+}
+
+.qc-char-tag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.qc-char-tag:active {
+  background: var(--bg-hover);
+}
+
+.qc-char-selected {
+  border-color: var(--primary-border);
+  background: var(--primary-light);
+}
+
+.qc-char-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  border: 2px solid var(--border);
+}
+
+.qc-relation-graph {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* ── 弹窗 ─────────────────────────────────────────── */
+.qc-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qc-modal {
+  background: var(--bg-primary);
+  border-radius: 20px;
+  padding: 24px;
+  max-width: 340px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.qc-ending-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qc-ending-modal {
+  background: var(--bg-primary);
+  border-radius: 24px;
+  padding: 32px 24px;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(255, 77, 141, 0.15);
+}
+
+/* ── 占位符 ───────────────────────────────────────── */
+.qc-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  text-align: center;
+  gap: 8px;
+}
+
+.qc-placeholder-icon {
+  font-size: 48px;
+  opacity: 0.5;
+}
+
+/* ── 通知 ─────────────────────────────────────────── */
+.qc-notification {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 13px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+/* ── 滚动条 ───────────────────────────────────────── */
+.qc-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.qc-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.qc-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+}
+
+/* ── 打字指示器 ───────────────────────────────────── */
+.qc-typing-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--primary);
+  border-radius: 50%;
+  margin: 0 2px;
+  animation: qcBounce 1.2s infinite;
+}
+
+.qc-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.qc-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes qcBounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-8px); }
+}
+
+/* ── 光标闪烁 ─────────────────────────────────────── */
+.qc-cursor {
+  display: inline-block;
+  animation: qcBlink 1s infinite;
+  color: var(--primary);
+  font-weight: 300;
+}
+
+@keyframes qcBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ── 心理警告脉冲 ─────────────────────────────────── */
+.qc-mental-warning {
+  animation: qcPulse 2s ease-in-out infinite;
+}
+
+@keyframes qcPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ── 开始页 ───────────────────────────────────────── */
+.qc-start-bg {
+  min-height: 100dvh;
+  background: linear-gradient(180deg, #fff0f5 0%, #fce7f3 40%, #ede9fe 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.qc-start-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 32px 24px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(255, 77, 141, 0.08);
+}
+
+.qc-start-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+  background: var(--bg-secondary);
+  transition: border-color 0.2s;
+}
+
+.qc-start-input:focus {
+  border-color: var(--primary);
+}
+
+.qc-start-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--primary), #f472b6);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.qc-start-btn:active {
+  transform: scale(0.97);
+}
+
+.qc-start-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.qc-start-btn-secondary {
+  width: 100%;
+  padding: 12px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.qc-start-btn-secondary:active {
+  background: var(--bg-hover);
+}
+
+/* ── 角色预览网格 ─────────────────────────────────── */
+.qc-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.qc-preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.qc-preview-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  border: 2px solid var(--border);
+}
+
+.qc-preview-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.qc-preview-title {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* ── 菜单弹窗 ─────────────────────────────────────── */
+.qc-menu-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  transition: background 0.2s;
+  color: var(--text-primary);
+}
+
+.qc-menu-btn:active {
+  background: var(--bg-hover);
+}
+
+/* ── 背包弹窗 ─────────────────────────────────────── */
+.qc-inventory-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-primary);
+  border-radius: 20px 20px 0 0;
+  max-height: 70vh;
+  overflow-y: auto;
+  z-index: 55;
+  padding: 16px;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.qc-inventory-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--text-muted);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+  opacity: 0.3;
+}
+
+.qc-item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.qc-item-row:active {
+  background: var(--bg-hover);
+}

@@ -1,0 +1,248 @@
+/**
+ * [INPUT]: 依赖 store.ts 状态和操作，parser.ts 文本解析，data.ts 道具/快捷操作
+ * [OUTPUT]: 对外提供 TabDialogue 组件
+ * [POS]: 对话 Tab：聊天气泡 + 快捷操作 + 背包 + 输入框
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
+
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useGameStore, STORY_INFO, ITEMS, QUICK_ACTIONS } from '@/lib/store'
+import { parseStoryParagraph } from '@/lib/parser'
+
+const P = 'qc'
+
+// ── 信笺卡片 ─────────────────────────────────────────
+function LetterCard() {
+  return (
+    <div className={`${P}-letter-card`}>
+      <div className={`${P}-letter-emoji`}>{STORY_INFO.emoji}</div>
+      <div className={`${P}-letter-genre`}>{STORY_INFO.genre}</div>
+      <div className={`${P}-letter-title`}>{STORY_INFO.title}</div>
+      <p className={`${P}-letter-desc`}>{STORY_INFO.description}</p>
+    </div>
+  )
+}
+
+// ── 打字指示器 ────────────────────────────────────────
+function TypingIndicator() {
+  return (
+    <div className={`${P}-bubble-npc`} style={{ display: 'flex', gap: 4, padding: '12px 20px' }}>
+      <span className={`${P}-typing-dot`} />
+      <span className={`${P}-typing-dot`} />
+      <span className={`${P}-typing-dot`} />
+    </div>
+  )
+}
+
+// ── 流式消息 ─────────────────────────────────────────
+function StreamingMessage({ content }: { content: string }) {
+  const { narrative } = parseStoryParagraph(content)
+  return (
+    <div className={`${P}-bubble-npc`}>
+      <div dangerouslySetInnerHTML={{ __html: narrative }} />
+      <span className={`${P}-cursor`}>▍</span>
+    </div>
+  )
+}
+
+// ── 背包弹窗 ─────────────────────────────────────────
+function InventorySheet({ onClose }: { onClose: () => void }) {
+  const inventory = useGameStore((s) => s.inventory)
+  const useItem = useGameStore((s) => s.useItem)
+
+  const items = ITEMS.filter((item) => (inventory[item.id] ?? 0) > 0)
+
+  return (
+    <>
+      <motion.div
+        className={`${P}-overlay`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        style={{ zIndex: 54 }}
+      />
+      <motion.div
+        className={`${P}-inventory-sheet`}
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+      >
+        <div className={`${P}-inventory-handle`} />
+        <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>🎒 背包</h3>
+        {items.length === 0 ? (
+          <div className={`${P}-placeholder`}>
+            <span className={`${P}-placeholder-icon`}>🎒</span>
+            <span>背包空空如也</span>
+          </div>
+        ) : (
+          items.map((item) => (
+            <div
+              key={item.id}
+              className={`${P}-item-row`}
+              onClick={() => { useItem(item.id); onClose() }}
+            >
+              <span style={{ fontSize: 24 }}>{item.icon}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>
+                  {item.name}
+                  {(inventory[item.id] ?? 0) > 1 && (
+                    <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>
+                      {' '}×{inventory[item.id]}
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                  {item.description}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </motion.div>
+    </>
+  )
+}
+
+// ── 对话 Tab 主组件 ──────────────────────────────────
+export default function TabDialogue() {
+  const messages = useGameStore((s) => s.messages)
+  const isTyping = useGameStore((s) => s.isTyping)
+  const streamingContent = useGameStore((s) => s.streamingContent)
+  const sendMessage = useGameStore((s) => s.sendMessage)
+  const currentCharacter = useGameStore((s) => s.currentCharacter)
+  const characters = useGameStore((s) => s.characters)
+  const inventory = useGameStore((s) => s.inventory)
+
+  const [input, setInput] = useState('')
+  const [showInventory, setShowInventory] = useState(false)
+  const chatRef = useRef<HTMLDivElement>(null)
+
+  // 自动滚动到底部
+  useEffect(() => {
+    if (chatRef.current) {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight
+    }
+  }, [messages.length, streamingContent])
+
+  const handleSend = useCallback(() => {
+    if (!input.trim() || isTyping) return
+    sendMessage(input.trim())
+    setInput('')
+  }, [input, isTyping, sendMessage])
+
+  const handleQuickAction = useCallback((action: string) => {
+    if (isTyping) return
+    sendMessage(action)
+  }, [isTyping, sendMessage])
+
+  const char = currentCharacter ? characters[currentCharacter] : null
+  const itemCount = Object.values(inventory).reduce((a, b) => a + b, 0)
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {/* ── 聊天区 ── */}
+      <div
+        ref={chatRef}
+        className={`${P}-scrollbar`}
+        style={{
+          flex: 1, overflow: 'auto', padding: '0 12px',
+          display: 'flex', flexDirection: 'column',
+        }}
+      >
+        {messages.length === 0 && <LetterCard />}
+
+        {messages.map((msg) => {
+          if (msg.role === 'system') {
+            return (
+              <motion.div
+                key={msg.id}
+                className={`${P}-bubble-system`}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                {msg.content}
+              </motion.div>
+            )
+          }
+          if (msg.role === 'user') {
+            return (
+              <motion.div
+                key={msg.id}
+                className={`${P}-bubble-player`}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                {msg.content}
+              </motion.div>
+            )
+          }
+          const { narrative, statHtml } = parseStoryParagraph(msg.content)
+          return (
+            <motion.div
+              key={msg.id}
+              className={`${P}-bubble-npc`}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <div dangerouslySetInnerHTML={{ __html: narrative }} />
+              {statHtml && <div dangerouslySetInnerHTML={{ __html: statHtml }} />}
+            </motion.div>
+          )
+        })}
+
+        {isTyping && !streamingContent && <TypingIndicator />}
+        {streamingContent && <StreamingMessage content={streamingContent} />}
+
+        <div style={{ height: 8, flexShrink: 0 }} />
+      </div>
+
+      {/* ── 快捷操作 ── */}
+      <div className={`${P}-quick-grid`}>
+        {QUICK_ACTIONS.map((action) => (
+          <button
+            key={action}
+            className={`${P}-quick-btn`}
+            onClick={() => handleQuickAction(action)}
+            disabled={isTyping}
+          >
+            {action}
+          </button>
+        ))}
+      </div>
+
+      {/* ── 输入区 ── */}
+      <div className={`${P}-input-area`}>
+        <button
+          className={`${P}-item-btn`}
+          onClick={() => setShowInventory(true)}
+        >
+          🎒
+          {itemCount > 0 && <span className={`${P}-item-badge`}>{itemCount}</span>}
+        </button>
+        <input
+          className={`${P}-input`}
+          placeholder={char ? `对${char.name}说...` : '说点什么...'}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+          disabled={isTyping}
+        />
+        <button
+          className={`${P}-send-btn`}
+          onClick={handleSend}
+          disabled={isTyping || !input.trim()}
+        >
+          ↑
+        </button>
+      </div>
+
+      {/* ── 背包弹窗 ── */}
+      <AnimatePresence>
+        {showInventory && <InventorySheet onClose={() => setShowInventory(false)} />}
+      </AnimatePresence>
+    </div>
+  )
+}
