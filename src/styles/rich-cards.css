@@ -100,12 +100,6 @@
   margin-top: 4px;
 }
 
-.qc-episode-period {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 6px;
-}
-
 /* ── NPC 气泡行（头像 + 气泡） ───────────────────────── */
 .qc-npc-row {
   display: flex;
@@ -265,12 +259,6 @@
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 4px;
-}
-
-.qc-dossier-relation-stage {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-bottom: 12px;
 }
 
 .qc-dossier-trigger {

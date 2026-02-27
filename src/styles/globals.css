@@ -613,21 +613,6 @@ body {
   opacity: 0.5;
 }
 
-/* ── 通知 ─────────────────────────────────────────── */
-.qc-notification {
-  position: fixed;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px 20px;
-  font-size: 13px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  z-index: 100;
-}
-
 /* ── 滚动条 ───────────────────────────────────────── */
 .qc-scrollbar::-webkit-scrollbar {
   width: 4px;
