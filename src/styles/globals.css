@@ -76,44 +76,34 @@ body {
 .qc-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
+  gap: 4px;
+  padding: 8px 8px;
   background: var(--bg-primary);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   min-height: 44px;
 }
 
-.qc-header-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
+.qc-header-time {
+  font-size: 12px;
   color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.qc-header-center {
+.qc-header-stats {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
-}
-
-.qc-header-right {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  gap: 4px;
+  flex: 1;
+  justify-content: center;
+  min-width: 0;
 }
 
 .qc-header-stat {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  font-size: 11px;
-  color: var(--text-secondary);
-  padding: 2px 6px;
-  background: var(--bg-hover);
-  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .qc-header-btn {

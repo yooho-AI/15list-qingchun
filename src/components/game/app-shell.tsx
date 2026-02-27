@@ -176,42 +176,27 @@ export default function AppShell({ onMenuOpen }: AppShellProps) {
     <div className={`${P}-shell`}>
       {/* ── Header ── */}
       <header className={`${P}-header`}>
-        <div className={`${P}-header-left`}>
-          <button className={`${P}-header-btn`} onClick={toggleDashboard}>📓</button>
-          <span>第{currentDay}期</span>
-          <span>{period?.icon} {period?.name}</span>
-        </div>
+        <button className={`${P}-header-btn`} onClick={toggleDashboard}>📓</button>
 
-        <div className={`${P}-header-center`}>
-          {GLOBAL_STAT_METAS.slice(0, 3).map((meta) => (
-            <div
+        <span className={`${P}-header-time`}>
+          第{currentDay}期·{period?.name}
+        </span>
+
+        <div className={`${P}-header-stats`}>
+          {GLOBAL_STAT_METAS.map((meta) => (
+            <span
               key={meta.key}
               className={`${P}-header-stat ${meta.key === 'mental' && mentalWarning ? `${P}-mental-warning` : ''}`}
+              style={{ color: meta.color }}
             >
-              <span>{meta.icon}</span>
-              <span style={{ color: meta.color, fontWeight: 600 }}>
-                {globalResources[meta.key as keyof GlobalResources]}
-              </span>
-            </div>
+              {meta.icon}{globalResources[meta.key as keyof GlobalResources]}
+            </span>
           ))}
         </div>
 
-        <div className={`${P}-header-right`}>
-          {GLOBAL_STAT_METAS.slice(3).map((meta) => (
-            <div
-              key={meta.key}
-              className={`${P}-header-stat ${meta.key === 'mental' && mentalWarning ? `${P}-mental-warning` : ''}`}
-            >
-              <span>{meta.icon}</span>
-              <span style={{ color: meta.color, fontWeight: 600 }}>
-                {globalResources[meta.key as keyof GlobalResources]}
-              </span>
-            </div>
-          ))}
-          <MusicPlayer />
-          <button className={`${P}-header-btn`} onClick={onMenuOpen}>☰</button>
-          <button className={`${P}-header-btn`} onClick={toggleRecords}>📜</button>
-        </div>
+        <MusicPlayer />
+        <button className={`${P}-header-btn`} onClick={onMenuOpen}>☰</button>
+        <button className={`${P}-header-btn`} onClick={toggleRecords}>📜</button>
       </header>
 
       {/* ── Tab 内容区（三向手势绑定） ── */}
