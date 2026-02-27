@@ -14,7 +14,7 @@ React 19 + Zustand 5 + Immer + Vite 7 + Tailwind CSS v4 + Framer Motion + Cloudf
 ├── src/
 │   ├── main.tsx                 - ☆ React 入口
 │   ├── vite-env.d.ts            - Vite 类型声明
-│   ├── App.tsx                  - 根组件: 三阶段开场(邀请函→群像闪切→姓名输入) + GameScreen + EndingModal + MenuOverlay
+│   ├── App.tsx                  - 根组件: 三阶段开场(全屏Splash→群像闪切→姓名输入) + GameScreen + EndingModal + MenuOverlay
 │   ├── lib/
 │   │   ├── script.md            - ★ 剧本直通：五模块原文（零转换注入 prompt）
 │   │   ├── data.ts              - ★ UI 薄层：类型(含富消息扩展) + 7角色 + 4场景 + 6道具 + 3章节 + 5事件 + 7结局
@@ -56,7 +56,7 @@ React 19 + Zustand 5 + Immer + Vite 7 + Tailwind CSS v4 + Framer Motion + Cloudf
 
 | 组件 | 位置 | 触发 | 视觉风格 |
 |------|------|------|----------|
-| InviteCard | App.tsx | 开场Phase1 | 磨砂玻璃选拔通知卡，弹簧入场 |
+| SplashScreen | App.tsx | 开场Phase1 | 全屏深紫渐变+C位立绘(78%)+20星光粒子+shimmer Logo+脉冲CTA |
 | CharacterMontage | App.tsx | 开场Phase2 | 7角色立绘顺序闪现(2s/人)，交替左右滑入 |
 | DashboardDrawer | dashboard-drawer | Header📓+右滑手势 | 左侧滑入手帐：偶像粉底+人物轮播+2×2场景+训练目标+道具+排名+音乐+Reorder拖拽排序 |
 | RecordSheet | app-shell | Header📜+左滑手势 | 右侧滑入事件记录：时间线倒序+粉色圆点 |

@@ -1,7 +1,7 @@
 /**
  * [INPUT]: 依赖 store.ts 全局状态，bgm.ts 音频，data.ts 类型+角色数据，analytics.ts 埋点
  * [OUTPUT]: 对外提供 App 根组件
- * [POS]: 应用入口，三阶段开场(邀请函→群像闪切→姓名输入) ↔ GameScreen + EndingModal + MenuOverlay
+ * [POS]: 应用入口，三阶段开场(全屏Splash→群像闪切→姓名输入) ↔ GameScreen + EndingModal + MenuOverlay
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
@@ -28,33 +28,85 @@ const ENDING_TYPE_MAP: Record<string, { label: string; color: string; icon: stri
 // ── 角色数据（群像闪切用） ───────────────────────────
 const ALL_CHARACTERS = Object.values(buildCharacters())
 
-// ── Phase 1: 邀请函 ─────────────────────────────────
-function InviteCard({ onConfirm }: { onConfirm: () => void }) {
+// ── 开场粒子（模块级初始化） ─────────────────────────
+const SPLASH_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+  size: 3 + Math.random() * 6,
+  delay: Math.random() * 5,
+  duration: 3 + Math.random() * 3,
+  kind: i % 4,
+}))
+
+// ── Phase 1: 全屏沉浸式开场 ─────────────────────────
+function SplashScreen({ onConfirm }: { onConfirm: () => void }) {
   return (
-    <div className="qc-start-bg">
-      <motion.div
-        className="qc-invite-card"
-        initial={{ opacity: 0, scale: 0.92, y: 30 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-      >
-        <div className="qc-invite-logo">TIANXING MEDIA</div>
-        <div style={{ fontSize: 48, marginBottom: 12 }}>⭐</div>
-        <h1 className="qc-invite-title">练习生选拔通知</h1>
-        <p className="qc-invite-body">
-          恭喜你通过天星传媒练习生初选。<br />
-          即日起，请前往公司报到，开启你的偶像之路。<br />
-          12期综艺考核，决定你的出道命运。
-        </p>
-        <div className="qc-invite-seal">天星传媒 · 练习生事业部</div>
-        <motion.button
-          className="qc-invite-cta"
-          onClick={onConfirm}
-          whileTap={{ scale: 0.97 }}
+    <div className="qc-splash" onClick={onConfirm}>
+      <div className="qc-splash-bg" />
+      <div className="qc-splash-particles">
+        {SPLASH_PARTICLES.map((p) => (
+          <div
+            key={p.id}
+            className={`qc-particle qc-particle-${p.kind}`}
+            style={{
+              left: `${p.x}%`,
+              top: `${p.y}%`,
+              width: p.size,
+              height: p.size,
+              animationDelay: `${p.delay}s`,
+              animationDuration: `${p.duration}s`,
+            }}
+          />
+        ))}
+      </div>
+      <div className="qc-splash-content">
+        <motion.div
+          className="qc-splash-character"
+          initial={{ opacity: 0, y: '8%', filter: 'blur(12px)' }}
+          animate={{ opacity: 1, y: '0%', filter: 'blur(0px)' }}
+          transition={{ duration: 1.2, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
         >
-          确认入社
-        </motion.button>
-      </motion.div>
+          <img src="/characters/guyanche.jpg" alt="" />
+        </motion.div>
+        <div className="qc-splash-ui">
+          <div className="qc-splash-top">
+            <motion.div
+              className="qc-splash-logo"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.5, duration: 0.6 }}
+            >
+              TIANXING MEDIA
+            </motion.div>
+            <motion.h1
+              className="qc-splash-title"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2, duration: 0.6 }}
+            >
+              青春练习生
+            </motion.h1>
+            <motion.p
+              className="qc-splash-tagline"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.7 }}
+              transition={{ delay: 2.3, duration: 0.6 }}
+            >
+              12期考核，你的出道命运由你书写
+            </motion.p>
+          </div>
+          <motion.div
+            className="qc-splash-bottom"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 3, duration: 0.5 }}
+          >
+            <button className="qc-splash-cta">接受邀请，成为制作人</button>
+            <div className="qc-splash-seal">天星传媒 · 练习生事业部</div>
+          </motion.div>
+        </div>
+      </div>
     </div>
   )
 }
@@ -224,13 +276,13 @@ function NameInput() {
 
 // ── 开场路由 ─────────────────────────────────────────
 function StartScreen() {
-  const [phase, setPhase] = useState<'invite' | 'montage' | 'input'>('invite')
+  const [phase, setPhase] = useState<'splash' | 'montage' | 'input'>('splash')
 
   return (
     <AnimatePresence mode="wait">
-      {phase === 'invite' && (
-        <motion.div key="invite" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-          <InviteCard onConfirm={() => setPhase('montage')} />
+      {phase === 'splash' && (
+        <motion.div key="splash" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+          <SplashScreen onConfirm={() => setPhase('montage')} />
         </motion.div>
       )}
       {phase === 'montage' && (
