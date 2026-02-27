@@ -53,11 +53,15 @@ body {
 /* ── 桌面居中容器 ─────────────────────────────────── */
 @media (min-width: 431px) {
   body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fff0f5, #fce7f3, #ede9fe);
+  }
+
+  #root {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #fff0f5, #fce7f3, #ede9fe);
   }
 
   .qc-shell {
