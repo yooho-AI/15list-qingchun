@@ -141,7 +141,7 @@ const TRAINEE_STAT_META: StatMeta[] = [
 const GU_YANCHE: Character = {
   id: 'guyanche',
   name: '顾言澈',
-  portrait: '/characters/guyanche.jpg',
+  portrait: '/characters/guyanche.jpg?v=3',
   gender: 'male',
   age: 28,
   title: '顶流男明星',
@@ -161,7 +161,7 @@ const GU_YANCHE: Character = {
 const SHEN_ZHEYUAN: Character = {
   id: 'shenzheyuan',
   name: '沈哲远',
-  portrait: '/characters/shenzheyuan.jpg',
+  portrait: '/characters/shenzheyuan.jpg?v=3',
   gender: 'male',
   age: 26,
   title: '舞蹈导师',
@@ -181,7 +181,7 @@ const SHEN_ZHEYUAN: Character = {
 const ZHOU_MUSHEN: Character = {
   id: 'zhoumushen',
   name: '周慕深',
-  portrait: '/characters/zhoumushen.jpg',
+  portrait: '/characters/zhoumushen.jpg?v=3',
   gender: 'male',
   age: 32,
   title: '王牌经纪人',
@@ -201,7 +201,7 @@ const ZHOU_MUSHEN: Character = {
 const LIN_SHIYU: Character = {
   id: 'linshiyu',
   name: '林诗雨',
-  portrait: '/characters/linshiyu.jpg',
+  portrait: '/characters/linshiyu.jpg?v=3',
   gender: 'female',
   age: 19,
   title: '天赋型·室友',
@@ -221,7 +221,7 @@ const LIN_SHIYU: Character = {
 const ZHAO_XIAOMAN: Character = {
   id: 'zhaoxiaoman',
   name: '赵小曼',
-  portrait: '/characters/zhaoxiaoman.jpg',
+  portrait: '/characters/zhaoxiaoman.jpg?v=3',
   gender: 'female',
   age: 20,
   title: '努力型·草根',
@@ -241,7 +241,7 @@ const ZHAO_XIAOMAN: Character = {
 const CHEN_KEER: Character = {
   id: 'chenkeer',
   name: '陈可儿',
-  portrait: '/characters/chenkeer.jpg',
+  portrait: '/characters/chenkeer.jpg?v=3',
   gender: 'female',
   age: 18,
   title: '心机型·颜值担当',
@@ -261,7 +261,7 @@ const CHEN_KEER: Character = {
 const SU_NIANNIAN: Character = {
   id: 'suniannian',
   name: '苏念念',
-  portrait: '/characters/suniannian.jpg',
+  portrait: '/characters/suniannian.jpg?v=3',
   gender: 'female',
   age: 21,
   title: '佛系型·隐藏实力',

@@ -67,7 +67,7 @@ function SplashScreen({ onConfirm }: { onConfirm: () => void }) {
           animate={{ opacity: 1, y: '0%', filter: 'blur(0px)' }}
           transition={{ duration: 1.2, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
         >
-          <img src="/characters/guyanche.jpg" alt="" />
+          <img src="/characters/guyanche.jpg?v=3" alt="" />
         </motion.div>
         <div className="qc-splash-ui">
           <div className="qc-splash-top">
