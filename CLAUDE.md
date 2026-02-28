@@ -58,7 +58,7 @@ React 19 + Zustand 5 + Immer + Vite 7 + Tailwind CSS v4 + Framer Motion + Cloudf
 |------|------|------|----------|
 | SplashScreen | App.tsx | 开场Phase1 | 全屏深紫渐变+C位立绘(78%)+20星光粒子+shimmer Logo+脉冲CTA |
 | CharacterMontage | App.tsx | 开场Phase2 | 7角色立绘顺序闪现(2s/人)，交替左右滑入 |
-| DashboardDrawer | dashboard-drawer | Header📓+右滑手势 | 左侧滑入手帐：偶像粉底+人物轮播+2×2场景+训练目标+道具+排名+音乐+Reorder拖拽排序 |
+| DashboardDrawer | dashboard-drawer | Header📓+右滑手势 | 毛玻璃+淡粉紫渐变：紧凑扉页+缘分速览(3男主好感)+2:3偶像卡牌+横向场景缩略图+checkbox目标+pill属性+道具+迷你播放+Reorder拖拽 |
 | RecordSheet | app-shell | Header📜+左滑手势 | 右侧滑入事件记录：时间线倒序+粉色圆点 |
 | SceneTransitionCard | tab-dialogue | selectScene | 场景背景+Ken Burns(8s)+渐变遮罩+粉色角标 |
 | EpisodeCard | tab-dialogue | 换期 | 综艺字幕风弹簧落入+逐字打字机(80ms)+章节名 |
