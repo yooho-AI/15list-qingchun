@@ -1,7 +1,7 @@
 /**
- * [INPUT]: 依赖 store.ts 全部游戏状态, data.ts 的 SCENES/ITEMS, bgm.ts, framer-motion (Reorder)
+ * [INPUT]: 依赖 store.ts 全部游戏状态, data.ts 的 SCENES/ITEMS/GLOBAL_STAT_METAS, bgm.ts, framer-motion (Reorder)
  * [OUTPUT]: 对外提供 DashboardDrawer 组件（练习生手帐）
- * [POS]: 左侧滑入抽屉，7组件：扉页/人物轮播/场景网格/训练目标/道具格/排名预览/音乐。拖拽排序。被 app-shell 消费
+ * [POS]: 左侧滑入抽屉，7组件：扉页/缘分速览/偶像卡牌/场景速览/训练目标/我的状态 + 底部迷你播放。拖拽排序。被 app-shell 消费
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
@@ -15,10 +15,10 @@ import type { GlobalResources } from '../../lib/store'
 import { useBgm } from '../../lib/bgm'
 
 const P = 'qc'
-const ORDER_KEY = 'qc-dash-order'
-const DEFAULT_ORDER = ['characters', 'scenes', 'goals', 'items', 'ranking', 'music']
+const ORDER_KEY = 'qc-dash-order-v2'
+const DEFAULT_ORDER = ['relations', 'characters', 'scenes', 'goals', 'status']
 
-// ── 扉页 ─────────────────────────────────────────────
+// ── 扉页（紧凑横排） ───────────────────────────────
 
 function FrontPage() {
   const { currentDay, currentPeriodIndex, actionPoints } = useGameStore()
@@ -28,32 +28,65 @@ function FrontPage() {
 
   return (
     <div className={`${P}-dash-front`}>
-      <div className={`${P}-dash-front-episode`}>第{currentDay}期</div>
-      <div className={`${P}-dash-front-period`}>
-        <span>{PERIOD_ICONS[currentPeriodIndex]}</span>
-        <span>{PERIODS[currentPeriodIndex]}</span>
+      <div className={`${P}-dash-front-left`}>
+        <div className={`${P}-dash-front-badge`}>{currentDay}</div>
+        <div className={`${P}-dash-front-meta`}>
+          <span className={`${P}-dash-front-period`}>
+            {PERIOD_ICONS[currentPeriodIndex]} {PERIODS[currentPeriodIndex]}
+          </span>
+          <span className={`${P}-dash-front-chapter`}>
+            第{chapter.id}章「{chapter.name}」
+          </span>
+        </div>
       </div>
-      <div className={`${P}-dash-front-chapter`}>
-        第{chapter.id}章「{chapter.name}」
-      </div>
-      <div className={`${P}-dash-front-ap`}>
-        <div className={`${P}-dash-front-bars`}>
+      <div className={`${P}-dash-front-right`}>
+        <div className={`${P}-dash-front-stars`}>
           {Array.from({ length: 3 }, (_, i) => (
-            <span
-              key={i}
-              className={`${P}-dash-bar ${i < actionPoints ? `${P}-dash-bar-filled` : ''}`}
-            />
+            <span key={i} className={i < actionPoints ? `${P}-dash-star-filled` : `${P}-dash-star-empty`}>
+              {i < actionPoints ? '★' : '☆'}
+            </span>
           ))}
         </div>
-        <span className={`${P}-dash-front-ap-text`}>
-          行动力 {actionPoints}/3
-        </span>
+        <span className={`${P}-dash-front-ap-text`}>行动力</span>
       </div>
     </div>
   )
 }
 
-// ── 人物轮播 ─────────────────────────────────────────
+// ── 缘分速览（3 男主好感一览） ──────────────────────
+
+function RelationshipMini({ onClose }: { onClose: () => void }) {
+  const { characters, characterStats, selectCharacter } = useGameStore()
+  const leads = Object.values(characters).filter((c) => c.isLead)
+
+  return (
+    <div className={`${P}-dash-relations`}>
+      {leads.map((c) => {
+        const val = characterStats[c.id]?.affection ?? 0
+        return (
+          <button
+            key={c.id}
+            className={`${P}-dash-relation-item`}
+            onClick={() => { selectCharacter(c.id); onClose() }}
+          >
+            <img
+              className={`${P}-dash-relation-avatar`}
+              src={c.portrait}
+              alt={c.name}
+              style={{ borderColor: c.themeColor }}
+            />
+            <span className={`${P}-dash-relation-name`}>{c.name}</span>
+            <span className={`${P}-dash-relation-val`} style={{ color: c.themeColor }}>
+              ❤️{val}
+            </span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+// ── 偶像卡牌（2:3 竖版） ────────────────────────────
 
 const SLIDE_VARIANTS = {
   enter: (d: number) => ({ x: d > 0 ? 260 : -260, opacity: 0, rotate: d > 0 ? 6 : -6 }),
@@ -91,6 +124,11 @@ function CharacterGallery({ onClose }: { onClose: () => void }) {
   const isAvailable = id in available
   const stats = characterStats[id] ?? {}
 
+  // 5 颗心：每 20 点填一颗
+  const heartCount = char.statMetas[0]
+    ? Math.floor((stats[char.statMetas[0].key] ?? 0) / 20)
+    : 0
+
   return (
     <div className={`${P}-dash-gallery-wrap`}>
       <div
@@ -113,28 +151,26 @@ function CharacterGallery({ onClose }: { onClose: () => void }) {
           >
             {isAvailable ? (
               <>
-                <div className={`${P}-dash-photo-img`}>
+                <div
+                  className={`${P}-dash-photo-img`}
+                  style={{ boxShadow: `0 0 16px ${char.themeColor}30` }}
+                >
                   <img src={char.portrait} alt={char.name} />
                   <div className={`${P}-dash-photo-nameplate`}>
-                    <div style={{ fontSize: 14, fontWeight: 600 }}>{char.name}</div>
+                    <div style={{ fontSize: 15, fontWeight: 600 }}>{char.name}</div>
                     <div style={{ fontSize: 11, opacity: 0.8 }}>{char.title}</div>
                   </div>
                 </div>
-                {char.statMetas.slice(0, 1).map((meta) => {
-                  const val = stats[meta.key] ?? 0
-                  return (
-                    <div key={meta.key} className={`${P}-dash-photo-stat`}>
-                      <span>{meta.icon}</span>
-                      <div className={`${P}-dash-photo-stat-track`}>
-                        <div
-                          className={`${P}-dash-photo-stat-fill`}
-                          style={{ width: `${val}%`, background: meta.color }}
-                        />
-                      </div>
-                      <span style={{ color: meta.color, fontSize: 12, fontWeight: 600 }}>{val}</span>
-                    </div>
-                  )
-                })}
+                <div className={`${P}-dash-photo-hearts`}>
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <span key={i} className={i < heartCount ? `${P}-dash-heart-filled` : `${P}-dash-heart-empty`}>
+                      {i < heartCount ? '❤️' : '🤍'}
+                    </span>
+                  ))}
+                  <span className={`${P}-dash-photo-hearts-val`}>
+                    {stats[char.statMetas[0]?.key] ?? 0}
+                  </span>
+                </div>
               </>
             ) : (
               <div className={`${P}-dash-photo-locked`}>
@@ -159,7 +195,7 @@ function CharacterGallery({ onClose }: { onClose: () => void }) {
   )
 }
 
-// ── 场景网格 (2×2) ───────────────────────────────────
+// ── 场景速览（横向滚动缩略图） ──────────────────────
 
 function SceneMap({ onClose }: { onClose: () => void }) {
   const { currentScene, unlockedScenes, selectScene } = useGameStore()
@@ -172,7 +208,7 @@ function SceneMap({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className={`${P}-dash-scene-grid`}>
+    <div className={`${P}-dash-scene-scroll`}>
       {sceneEntries.map(([sid, scene]) => {
         const isCurrent = sid === currentScene
         const isLocked = !unlockedScenes.includes(sid)
@@ -180,15 +216,16 @@ function SceneMap({ onClose }: { onClose: () => void }) {
           <button
             key={sid}
             className={[
-              `${P}-dash-scene-cell`,
+              `${P}-dash-scene-thumb`,
               isCurrent && `${P}-dash-scene-cur`,
               isLocked && `${P}-dash-scene-lock`,
             ].filter(Boolean).join(' ')}
             onClick={() => handleClick(sid)}
             disabled={isLocked}
           >
-            <span style={{ fontSize: 20 }}>{isLocked ? '🔒' : scene.icon}</span>
-            <span style={{ fontSize: 12 }}>{isLocked ? '???' : scene.name}</span>
+            <img src={scene.background} alt={scene.name} />
+            {isLocked && <div className={`${P}-dash-scene-lock-icon`}>🔒</div>}
+            <span className={`${P}-dash-scene-label`}>{isLocked ? '???' : scene.name}</span>
           </button>
         )
       })}
@@ -196,119 +233,88 @@ function SceneMap({ onClose }: { onClose: () => void }) {
   )
 }
 
-// ── 训练目标 ─────────────────────────────────────────
+// ── 训练目标（精简 checkbox） ────────────────────────
 
 function TrainingGoals() {
-  const { currentDay, globalResources } = useGameStore()
+  const { currentDay } = useGameStore()
   const chapter = getCurrentChapter(currentDay)
-  const progress = Math.round(
-    (globalResources.vocal + globalResources.dance + globalResources.charm) / 3
-  )
 
   return (
     <div className={`${P}-dash-goals`}>
-      <div className={`${P}-dash-chapter-badge`}>
-        第{chapter.id}章「{chapter.name}」
-      </div>
       <ul className={`${P}-dash-goal-list`}>
         {chapter.objectives.map((obj, i) => (
           <li key={i} className={`${P}-dash-goal-item`}>
-            <span className={`${P}-dash-goal-dot`} />
+            <span className={`${P}-dash-goal-check`}>☐</span>
             <span>{obj}</span>
           </li>
         ))}
       </ul>
-      <div className={`${P}-dash-progress`}>
-        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>综合实力</span>
-        <div className={`${P}-dash-progress-track`}>
-          <div
-            className={`${P}-dash-progress-fill`}
-            style={{ width: `${Math.min(100, progress)}%` }}
-          />
-        </div>
-        <span style={{ fontSize: 11, color: 'var(--primary)', fontWeight: 600 }}>{progress}</span>
-      </div>
     </div>
   )
 }
 
-// ── 道具格子 ─────────────────────────────────────────
+// ── 我的状态（属性 pills + 道具贴纸） ───────────────
 
-function ItemBoard() {
-  const { inventory } = useGameStore()
+function StatusBoard() {
+  const { globalResources, inventory } = useGameStore()
   const collected = ITEMS.filter((item) => (inventory[item.id] ?? 0) > 0)
 
-  if (collected.length === 0) {
-    return <div className={`${P}-dash-empty`}>暂无道具</div>
-  }
-
   return (
-    <div className={`${P}-dash-item-grid`}>
-      {collected.map((item) => (
-        <div key={item.id} className={`${P}-dash-item-cell`}>
-          <span style={{ fontSize: 22 }}>{item.icon}</span>
-          <span style={{ fontSize: 11 }}>{item.name}</span>
-          {(inventory[item.id] ?? 0) > 1 && (
-            <span className={`${P}-dash-item-count`}>×{inventory[item.id]}</span>
-          )}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ── 排名预览 (5全局属性mini条形图) ───────────────────
-
-function RankingPreview() {
-  const globalResources = useGameStore((s) => s.globalResources)
-
-  return (
-    <div className={`${P}-dash-ranking`}>
-      {GLOBAL_STAT_METAS.map((meta) => {
-        const val = globalResources[meta.key as keyof GlobalResources]
-        return (
-          <div key={meta.key} className={`${P}-dash-rank-row`}>
-            <span style={{ fontSize: 11, minWidth: 40 }}>{meta.icon} {meta.label}</span>
-            <div className={`${P}-dash-rank-track`}>
-              <div
-                className={`${P}-dash-rank-fill`}
-                style={{ width: `${val}%`, background: meta.color }}
-              />
-            </div>
-            <span style={{ fontSize: 11, color: meta.color, fontWeight: 600, minWidth: 24, textAlign: 'right' }}>
-              {val}
+    <div className={`${P}-dash-status`}>
+      {/* 属性 pills */}
+      <div className={`${P}-dash-stat-pills`}>
+        {GLOBAL_STAT_METAS.map((meta) => {
+          const val = globalResources[meta.key as keyof GlobalResources]
+          return (
+            <span
+              key={meta.key}
+              className={`${P}-dash-stat-pill`}
+              style={{ background: `${meta.color}15`, color: meta.color, borderColor: `${meta.color}30` }}
+            >
+              {meta.icon}{val}
             </span>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
+
+      {/* 道具贴纸 */}
+      {collected.length > 0 && (
+        <div className={`${P}-dash-item-grid`}>
+          {collected.map((item) => (
+            <div key={item.id} className={`${P}-dash-item-cell`}>
+              <span style={{ fontSize: 20 }}>{item.icon}</span>
+              <span style={{ fontSize: 10 }}>{item.name}</span>
+              {(inventory[item.id] ?? 0) > 1 && (
+                <span className={`${P}-dash-item-count`}>×{inventory[item.id]}</span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      {collected.length === 0 && (
+        <div className={`${P}-dash-empty`}>暂无道具</div>
+      )}
     </div>
   )
 }
 
-// ── 音乐播放器 ───────────────────────────────────────
+// ── 底部迷你播放条 ──────────────────────────────────
 
-function MusicSection() {
+function MiniPlayer() {
   const { isPlaying, toggle } = useBgm()
 
   return (
-    <div className={`${P}-dash-music`}>
-      <div className={`${P}-dash-music-cover ${isPlaying ? `${P}-dash-music-spin` : ''}`}>
-        <img src="/scenes/practice.jpg" alt="" />
-      </div>
-      <div style={{ fontSize: 13, fontWeight: 600, marginTop: 8 }}>青春进行曲</div>
-      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>原声</div>
-      <div className={`${P}-dash-music-controls`}>
-        <button className={`${P}-dash-music-side`} disabled>⏪</button>
-        <button className={`${P}-dash-music-play`} onClick={(e) => toggle(e)}>
-          {isPlaying ? '⏸' : '▶'}
-        </button>
-        <button className={`${P}-dash-music-side`} disabled>⏩</button>
-      </div>
+    <div className={`${P}-dash-mini-player`}>
+      <span className={`${P}-dash-mini-note`}>♫</span>
+      <span className={`${P}-dash-mini-title`}>青春进行曲</span>
+      <button className={`${P}-dash-mini-btn`} onClick={(e) => toggle(e)}>
+        {isPlaying ? '⏸' : '▶'}
+      </button>
     </div>
   )
 }
 
-// ── 可拖拽 Section 包装 ──────────────────────────────
+// ── 可拖拽 Section 包装 ─────────────────────────────
 
 function DashSection({ id, title, children }: {
   id: string; title: string; children: React.ReactNode
@@ -319,7 +325,13 @@ function DashSection({ id, title, children }: {
       <div className={`${P}-dash-reorder`}>
         <div className={`${P}-dash-section-header`}>
           <div className={`${P}-dash-section-title`}>{title}</div>
-          <div className={`${P}-dash-grip`} onPointerDown={(e) => controls.start(e)}>⋮⋮</div>
+          <div className={`${P}-dash-grip`} onPointerDown={(e) => controls.start(e)}>
+            <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor">
+              <rect y="0" width="14" height="2" rx="1" />
+              <rect y="4" width="14" height="2" rx="1" />
+              <rect y="8" width="14" height="2" rx="1" />
+            </svg>
+          </div>
         </div>
         {children}
       </div>
@@ -327,18 +339,17 @@ function DashSection({ id, title, children }: {
   )
 }
 
-// ── 标题映射 ─────────────────────────────────────────
+// ── 标题映射 ────────────────────────────────────────
 
 const SECTION_TITLES: Record<string, string> = {
-  characters: '练习生们',
-  scenes: '场景',
+  relations: '缘分速览',
+  characters: '偶像卡牌',
+  scenes: '场景速览',
   goals: '训练目标',
-  items: '道具',
-  ranking: '能力雷达',
-  music: '氛围音乐',
+  status: '我的状态',
 }
 
-// ── DashboardDrawer 主体 ─────────────────────────────
+// ── DashboardDrawer 主体 ────────────────────────────
 
 export default function DashboardDrawer({ onClose }: { onClose: () => void }) {
   const [order, setOrder] = useState<string[]>(() => {
@@ -358,12 +369,11 @@ export default function DashboardDrawer({ onClose }: { onClose: () => void }) {
 
   const renderSection = (key: string) => {
     switch (key) {
+      case 'relations':  return <RelationshipMini onClose={onClose} />
       case 'characters': return <CharacterGallery onClose={onClose} />
       case 'scenes':     return <SceneMap onClose={onClose} />
       case 'goals':      return <TrainingGoals />
-      case 'items':      return <ItemBoard />
-      case 'ranking':    return <RankingPreview />
-      case 'music':      return <MusicSection />
+      case 'status':     return <StatusBoard />
       default:           return null
     }
   }
@@ -404,6 +414,8 @@ export default function DashboardDrawer({ onClose }: { onClose: () => void }) {
             ))}
           </Reorder.Group>
         </div>
+
+        <MiniPlayer />
       </motion.div>
     </motion.div>
   )

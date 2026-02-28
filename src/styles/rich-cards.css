@@ -381,12 +381,13 @@
 
 /* ══════════════════════════════════════════════════════
    DashboardDrawer — 练习生手帐（左侧抽屉）
+   玻璃拟态 + 杂志排版 · 偶像手帐风
    ══════════════════════════════════════════════════════ */
 
 .qc-dash-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.35);
   z-index: 50;
 }
 
@@ -397,10 +398,10 @@
   bottom: 0;
   width: 85vw;
   max-width: 360px;
-  background: var(--bg-dash, #fff5f8);
+  background: linear-gradient(180deg, #fff8fa 0%, #fef0f5 50%, #f5f0ff 100%);
   display: flex;
   flex-direction: column;
-  box-shadow: 4px 0 24px rgba(255, 77, 141, 0.1);
+  box-shadow: 4px 0 32px rgba(255, 77, 141, 0.12);
 }
 
 .qc-dash-header {
@@ -408,27 +409,28 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255, 77, 141, 0.08);
 }
 
 .qc-dash-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--primary);
+  letter-spacing: 1px;
 }
 
 .qc-dash-close {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: var(--bg-hover);
+  background: rgba(255, 77, 141, 0.06);
   border: none;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
 .qc-dash-scroll {
@@ -437,80 +439,89 @@
   padding: 12px;
 }
 
-/* ── 扉页 ────────────────────────────────────────── */
+/* ── 扉页（紧凑横排） ───────────────────────────── */
 
 .qc-dash-front {
-  background: linear-gradient(135deg, #fff0f5, #fce7f3);
-  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 77, 141, 0.1);
   border-radius: 16px;
-  padding: 16px;
-  text-align: center;
+  padding: 12px 14px;
   margin-bottom: 12px;
 }
 
-.qc-dash-front-episode {
-  font-size: 22px;
+.qc-dash-front-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qc-dash-front-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff4d8d, #c084fc);
+  color: white;
+  font-size: 18px;
   font-weight: 800;
-  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(255, 77, 141, 0.3);
+}
+
+.qc-dash-front-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .qc-dash-front-period {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin: 4px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
 .qc-dash-front-chapter {
-  font-size: 12px;
-  color: var(--text-muted);
-  background: var(--primary-light);
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: 8px;
-  margin-top: 4px;
-}
-
-.qc-dash-front-ap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.qc-dash-front-bars {
-  display: flex;
-  gap: 4px;
-}
-
-.qc-dash-bar {
-  width: 28px;
-  height: 6px;
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.08);
-}
-
-.qc-dash-bar-filled {
-  background: var(--primary);
-}
-
-.qc-dash-front-ap-text {
   font-size: 11px;
   color: var(--text-muted);
 }
 
-/* ── 可拖拽区块 ──────────────────────────────────── */
+.qc-dash-front-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.qc-dash-front-stars {
+  display: flex;
+  gap: 2px;
+  font-size: 16px;
+}
+
+.qc-dash-star-filled { color: #fbbf24; }
+.qc-dash-star-empty { color: #e5e7eb; }
+
+.qc-dash-front-ap-text {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* ── 可拖拽区块（毛玻璃） ────────────────────────── */
 
 .qc-dash-reorder {
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 77, 141, 0.06);
+  border-radius: 16px;
   padding: 12px;
   margin-bottom: 10px;
+  box-shadow: 0 2px 12px rgba(255, 77, 141, 0.04);
 }
 
 .qc-dash-section-header {
@@ -521,22 +532,63 @@
 }
 
 .qc-dash-section-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--text-muted);
-  letter-spacing: 1px;
+  color: rgba(255, 77, 141, 0.5);
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 .qc-dash-grip {
-  font-size: 14px;
-  color: var(--text-muted);
+  color: rgba(0, 0, 0, 0.15);
   cursor: grab;
   padding: 4px;
   user-select: none;
   touch-action: none;
+  display: flex;
+  align-items: center;
 }
 
-/* ── 人物轮播 ────────────────────────────────────── */
+/* ── 缘分速览（3 男主好感） ──────────────────────── */
+
+.qc-dash-relations {
+  display: flex;
+  justify-content: space-around;
+}
+
+.qc-dash-relation-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.qc-dash-relation-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  border: 2px solid;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.qc-dash-relation-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.qc-dash-relation-val {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ── 偶像卡牌（2:3 竖版） ────────────────────────── */
 
 .qc-dash-gallery-wrap {
   display: flex;
@@ -546,7 +598,7 @@
 
 .qc-dash-carousel {
   width: 100%;
-  min-height: 140px;
+  min-height: 200px;
   position: relative;
   overflow: hidden;
 }
@@ -561,9 +613,9 @@
 .qc-dash-photo-img {
   position: relative;
   width: 100%;
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 2 / 3;
 }
 
 .qc-dash-photo-img img {
@@ -578,39 +630,35 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 24px 12px 8px;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
+  padding: 32px 14px 10px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
   color: white;
 }
 
-.qc-dash-photo-stat {
+.qc-dash-photo-hearts {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-  width: 100%;
+  gap: 3px;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.qc-dash-heart-filled { filter: none; }
+.qc-dash-heart-empty { opacity: 0.4; }
+
+.qc-dash-photo-hearts-val {
   font-size: 12px;
-}
-
-.qc-dash-photo-stat-track {
-  flex: 1;
-  height: 4px;
-  background: rgba(0, 0, 0, 0.06);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.qc-dash-photo-stat-fill {
-  height: 100%;
-  border-radius: 2px;
-  transition: width 0.4s;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-left: 4px;
 }
 
 .qc-dash-photo-locked {
   width: 100%;
-  aspect-ratio: 3 / 2;
-  border-radius: 12px;
-  background: var(--bg-secondary);
+  aspect-ratio: 2 / 3;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px dashed rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -630,7 +678,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.1);
   border: none;
   cursor: pointer;
   padding: 0;
@@ -643,32 +691,55 @@
   border-radius: 3px;
 }
 
-/* ── 场景网格 (2×2) ──────────────────────────────── */
+/* ── 场景速览（横向滚动缩略图） ──────────────────── */
 
-.qc-dash-scene-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.qc-dash-scene-cell {
+.qc-dash-scene-scroll {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 12px 8px;
-  background: var(--bg-secondary);
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
-.qc-dash-scene-cell:active { background: var(--bg-hover); }
+.qc-dash-scene-scroll::-webkit-scrollbar { display: none; }
+
+.qc-dash-scene-thumb {
+  flex-shrink: 0;
+  width: 80px;
+  height: 60px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  border: 2px solid transparent;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.qc-dash-scene-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.qc-dash-scene-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+  padding: 8px 4px 3px;
+  text-align: center;
+}
 
 .qc-dash-scene-cur {
   border-color: var(--primary);
-  background: var(--primary-light);
+  box-shadow: 0 0 10px rgba(255, 77, 141, 0.25);
 }
 
 .qc-dash-scene-lock {
@@ -676,19 +747,22 @@
   cursor: not-allowed;
 }
 
-/* ── 训练目标 ────────────────────────────────────── */
+.qc-dash-scene-lock img {
+  filter: blur(3px);
+}
+
+.qc-dash-scene-lock-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+/* ── 训练目标（checkbox 风格） ────────────────────── */
 
 .qc-dash-goals { font-size: 13px; }
-
-.qc-dash-chapter-badge {
-  display: inline-block;
-  font-size: 11px;
-  color: var(--primary);
-  background: var(--primary-light);
-  padding: 2px 10px;
-  border-radius: 8px;
-  margin-bottom: 8px;
-}
 
 .qc-dash-goal-list {
   list-style: none;
@@ -700,47 +774,47 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 0;
+  padding: 3px 0;
   font-size: 12px;
   color: var(--text-secondary);
 }
 
-.qc-dash-goal-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--primary);
+.qc-dash-goal-check {
+  font-size: 14px;
+  color: var(--primary);
   flex-shrink: 0;
+  line-height: 1;
 }
 
-.qc-dash-progress {
+/* ── 我的状态（pills + 道具） ────────────────────── */
+
+.qc-dash-status {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.qc-dash-stat-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.qc-dash-stat-pill {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 3px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid;
 }
-
-.qc-dash-progress-track {
-  flex: 1;
-  height: 6px;
-  background: rgba(0, 0, 0, 0.06);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.qc-dash-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), #f472b6);
-  border-radius: 3px;
-  transition: width 0.6s;
-}
-
-/* ── 道具格子 ────────────────────────────────────── */
 
 .qc-dash-item-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
 
 .qc-dash-item-cell {
@@ -749,8 +823,8 @@
   align-items: center;
   gap: 2px;
   padding: 8px 4px;
-  background: var(--bg-secondary);
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
   position: relative;
 }
 
@@ -765,107 +839,47 @@
 
 .qc-dash-empty {
   text-align: center;
-  padding: 16px;
+  padding: 12px;
   font-size: 12px;
   color: var(--text-muted);
 }
 
-/* ── 排名预览 ────────────────────────────────────── */
+/* ── 底部迷你播放条 ──────────────────────────────── */
 
-.qc-dash-ranking {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.qc-dash-rank-row {
+.qc-dash-mini-player {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid rgba(255, 77, 141, 0.08);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
 }
 
-.qc-dash-rank-track {
+.qc-dash-mini-note {
+  font-size: 14px;
+  color: var(--primary);
+}
+
+.qc-dash-mini-title {
   flex: 1;
-  height: 5px;
-  background: rgba(0, 0, 0, 0.06);
-  border-radius: 3px;
-  overflow: hidden;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
-.qc-dash-rank-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.5s;
-}
-
-/* ── 音乐播放器 ──────────────────────────────────── */
-
-.qc-dash-music {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.qc-dash-music-cover {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid var(--primary);
-}
-
-.qc-dash-music-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.qc-dash-music-spin {
-  animation: qcSpin 8s linear infinite;
-}
-
-@keyframes qcSpin {
-  to { transform: rotate(360deg); }
-}
-
-.qc-dash-music-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.qc-dash-music-play {
-  width: 36px;
-  height: 36px;
+.qc-dash-mini-btn {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: var(--primary);
   border: none;
   color: white;
-  font-size: 14px;
+  font-size: 11px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.qc-dash-music-side {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  font-size: 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.qc-dash-music-side:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
 }
 
 /* ══════════════════════════════════════════════════════
