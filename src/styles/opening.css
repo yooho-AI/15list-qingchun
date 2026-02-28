@@ -7,6 +7,7 @@
 
 /* ── Phase 3: 暗色通行证 ────────────────────────────── */
 .qc-start-bg {
+  width: 100%;
   min-height: 100dvh;
   background: linear-gradient(180deg, #0f0520 0%, #1a0b3e 50%, #0f0520 100%);
   display: flex;
