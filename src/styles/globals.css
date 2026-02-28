@@ -2,29 +2,29 @@
 
 /* ── CSS 变量（紫调奢华主题） ─────────────────────── */
 :root {
-  --bg-primary: #fdfbfe;
-  --bg-secondary: #f8f4fc;
-  --bg-hover: rgba(139, 92, 246, 0.06);
-  --bg-active: rgba(139, 92, 246, 0.12);
+  --bg-primary: #110a1f;
+  --bg-secondary: #1a0f2e;
+  --bg-hover: rgba(139, 92, 246, 0.1);
+  --bg-active: rgba(139, 92, 246, 0.18);
 
-  --text-primary: #1e1b2e;
-  --text-secondary: #6b6580;
-  --text-muted: #9f97b0;
+  --text-primary: #e8dff5;
+  --text-secondary: #a193b8;
+  --text-muted: #6d5f84;
 
-  --border: rgba(139, 92, 246, 0.12);
+  --border: rgba(139, 92, 246, 0.18);
   --primary: #ff4d8d;
   --primary-rgb: 255, 77, 141;
-  --primary-light: rgba(255, 77, 141, 0.08);
+  --primary-light: rgba(255, 77, 141, 0.12);
   --primary-border: rgba(255, 77, 141, 0.25);
   --accent: #8b5cf6;
   --gold: #ffd700;
 
-  --bg-dash: #fff5f8;
-  --glass: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(139, 92, 246, 0.1);
-  --shadow-card: 0 2px 12px rgba(139, 92, 246, 0.06);
-  --shadow-card-hover: 0 4px 16px rgba(139, 92, 246, 0.12);
-  --shadow-glow: 0 0 16px rgba(255, 77, 141, 0.15);
+  --bg-dash: #130a24;
+  --glass: rgba(22, 12, 42, 0.75);
+  --glass-border: rgba(139, 92, 246, 0.15);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.4);
+  --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 16px rgba(255, 77, 141, 0.2);
 
   --font: 'system-ui', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
@@ -57,7 +57,7 @@ body {
 @media (min-width: 431px) {
   body {
     min-height: 100vh;
-    background: linear-gradient(135deg, #f3eeff, #fce7f3, #ede9fe);
+    background: linear-gradient(135deg, #0a0515, #0f0822, #0a0515);
   }
 
   #root {
@@ -219,8 +219,8 @@ body {
 .qc-bubble-system {
   align-self: center;
   padding: 5px 14px;
-  background: rgba(139, 92, 246, 0.06);
-  border: 1px solid rgba(139, 92, 246, 0.08);
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.15);
   border-radius: 20px;
   font-size: 11px;
   color: var(--text-muted);
@@ -245,7 +245,7 @@ body {
 .qc-bubble-npc .stat-changes {
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid rgba(139, 92, 246, 0.08);
+  border-top: 1px solid rgba(139, 92, 246, 0.15);
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -256,7 +256,7 @@ body {
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 8px;
-  background: rgba(139, 92, 246, 0.06);
+  background: rgba(139, 92, 246, 0.12);
 }
 
 .qc-bubble-npc .stat-up { color: #10b981; }
@@ -272,8 +272,8 @@ body {
 
 .qc-quick-btn {
   padding: 8px 12px;
-  background: rgba(139, 92, 246, 0.04);
-  border: 1px solid rgba(139, 92, 246, 0.12);
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.15);
   border-radius: 20px;
   color: var(--text-secondary);
   font-size: 13px;
@@ -312,8 +312,8 @@ body {
 .qc-input {
   flex: 1;
   padding: 10px 16px;
-  background: rgba(139, 92, 246, 0.04);
-  border: 1px solid rgba(139, 92, 246, 0.1);
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.15);
   border-radius: 22px;
   font-size: 14px;
   color: var(--text-primary);
@@ -324,7 +324,7 @@ body {
 .qc-input:focus {
   border-color: rgba(139, 92, 246, 0.3);
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08);
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(22, 12, 42, 0.9);
 }
 
 .qc-input::placeholder {
@@ -523,7 +523,7 @@ body {
 .qc-stat-track {
   flex: 1;
   height: 6px;
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 3px;
   overflow: hidden;
 }

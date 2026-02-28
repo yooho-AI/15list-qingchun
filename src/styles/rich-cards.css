@@ -66,7 +66,7 @@
 /* ── 期变卡片 ────────────────────────────────────────── */
 .qc-episode-card {
   align-self: center;
-  background: linear-gradient(135deg, #fff0f5, #fce7f3);
+  background: linear-gradient(135deg, #1e0a2a, #2a1040);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 16px 24px;
@@ -142,7 +142,7 @@
 .qc-npc-bubble .stat-changes {
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid rgba(139, 92, 246, 0.08);
+  border-top: 1px solid rgba(139, 92, 246, 0.15);
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -153,7 +153,7 @@
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 8px;
-  background: rgba(139, 92, 246, 0.06);
+  background: rgba(139, 92, 246, 0.12);
 }
 
 .qc-npc-bubble .stat-up { color: #10b981; }
@@ -403,7 +403,7 @@
   bottom: 0;
   width: 85vw;
   max-width: 360px;
-  background: linear-gradient(180deg, #fff8fa 0%, #fef0f5 50%, #f5f0ff 100%);
+  background: linear-gradient(180deg, #160a28 0%, #1a0d2e 50%, #130a22 100%);
   display: flex;
   flex-direction: column;
   box-shadow: 4px 0 32px rgba(255, 77, 141, 0.12);
@@ -450,9 +450,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(22, 12, 42, 0.6);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 77, 141, 0.1);
+  border: 1px solid rgba(255, 77, 141, 0.15);
   border-radius: 16px;
   padding: 12px 14px;
   margin-bottom: 12px;
@@ -510,7 +510,7 @@
 }
 
 .qc-dash-star-filled { color: #fbbf24; }
-.qc-dash-star-empty { color: #e5e7eb; }
+.qc-dash-star-empty { color: #3a3050; }
 
 .qc-dash-front-ap-text {
   font-size: 10px;
@@ -520,9 +520,9 @@
 /* ── 可拖拽区块（毛玻璃） ────────────────────────── */
 
 .qc-dash-reorder {
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(22, 12, 42, 0.65);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 77, 141, 0.06);
+  border: 1px solid rgba(255, 77, 141, 0.12);
   border-radius: 16px;
   padding: 12px;
   margin-bottom: 10px;
@@ -545,7 +545,7 @@
 }
 
 .qc-dash-grip {
-  color: rgba(0, 0, 0, 0.15);
+  color: rgba(255, 255, 255, 0.15);
   cursor: grab;
   padding: 4px;
   user-select: none;
@@ -662,8 +662,8 @@
   width: 100%;
   aspect-ratio: 2 / 3;
   border-radius: 14px;
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px dashed rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -683,7 +683,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.1);
   border: none;
   cursor: pointer;
   padding: 0;
@@ -828,7 +828,7 @@
   align-items: center;
   gap: 2px;
   padding: 8px 4px;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(22, 12, 42, 0.5);
   border-radius: 12px;
   position: relative;
 }
@@ -857,7 +857,7 @@
   gap: 8px;
   padding: 10px 16px;
   border-top: 1px solid rgba(255, 77, 141, 0.08);
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(22, 12, 42, 0.5);
   backdrop-filter: blur(8px);
 }
 
@@ -929,7 +929,7 @@
   display: flex;
   gap: 12px;
   padding: 8px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .qc-record-dot {

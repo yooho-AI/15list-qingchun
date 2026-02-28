@@ -4,9 +4,9 @@ L2 | 父级: /15list-qingchun/CLAUDE.md
 
 ## 成员清单
 
-- `globals.css`: 全局基础样式——CSS变量(亮色偶像主题,含--bg-dash) + Shell/Header/TabBar + 对话气泡 + 输入区 + 弹窗 + 滚动条 + 动画关键帧
+- `globals.css`: 全局基础样式——CSS变量(暗紫主题#110a1f,偶像粉#ff4d8d,暗色毛玻璃) + Shell/Header/TabBar + 对话气泡 + 输入区 + 弹窗 + 滚动条 + 动画关键帧
 - `opening.css`: 开场三阶段样式——全屏Splash(深紫渐变+星光粒子+角色立绘+shimmer Logo+脉冲CTA) + 群像闪切(全屏立绘+进度点+跳过) + 暗色通行证(3男主竖卡+暗色输入框+胶囊按钮)
-- `rich-cards.css`: 富UI组件样式——场景转场卡(Ken Burns) + 期变卡片(弹簧+逐字打字机) + NPC头像气泡行 + 角色档案卡(呼吸动画) + 荧光棒播放器 + DashboardDrawer(毛玻璃卡片+淡粉紫渐变：紧凑扉页/缘分速览/2:3偶像卡牌/横向场景缩略图/checkbox目标/pill属性+道具/迷你播放) + RecordSheet(时间线) + SVG关系图容器 + Toast通知
+- `rich-cards.css`: 富UI组件样式——场景转场卡(Ken Burns) + 期变卡片(暗紫渐变) + NPC头像气泡行(暗色毛玻璃) + 角色档案卡(呼吸动画) + 荧光棒播放器 + DashboardDrawer(暗色毛玻璃+深紫渐变：紧凑扉页/缘分速览/2:3偶像卡牌/横向场景缩略图/checkbox目标/pill属性+道具/迷你播放) + RecordSheet(时间线) + SVG关系图容器 + Toast通知
 
 ## 设计约束
 

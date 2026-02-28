@@ -47,7 +47,7 @@ React 19 + Zustand 5 + Immer + Vite 7 + Tailwind CSS v4 + Framer Motion + Cloudf
 
 - **偶像养成 + 恋爱线**：3 男主攻略 + 4 女练习生同伴，12 期综艺
 - **双轨数值**：5 全局属性（Vocal/Dance/颜值/粉丝/心理）+ NPC 好感/友好度
-- **亮色主题**：#ff4d8d 偶像粉，qc- CSS 前缀
+- **暗紫主题**：深紫底(#110a1f)+偶像粉(#ff4d8d)，暗色毛玻璃，qc- CSS 前缀
 - **3 时段制**：每期 3 时段（早晨/中午/晚上），共 36 时间槽
 - **剧本直通**：script.md 存五模块原文，?raw import 注入 prompt
 - **7 结局**：BE×2 + TE×2 + HE×2 + NE×2，优先级 BE→TE→HE→NE

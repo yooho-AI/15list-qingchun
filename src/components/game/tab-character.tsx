@@ -332,7 +332,7 @@ export default function TabCharacter() {
                 const level = getStatLevel(val)
                 return (
                   <span style={{
-                    fontSize: 11, background: 'rgba(255,255,255,0.2)',
+                    fontSize: 11, background: 'rgba(139, 92, 246, 0.15)',
                     padding: '2px 8px', borderRadius: 8, color: level.color,
                   }}>
                     {level.name}

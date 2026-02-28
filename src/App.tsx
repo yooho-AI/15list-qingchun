@@ -277,17 +277,17 @@ function StartScreen() {
   return (
     <AnimatePresence mode="wait">
       {phase === 'splash' && (
-        <motion.div key="splash" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+        <motion.div key="splash" style={{ width: '100%' }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
           <SplashScreen onConfirm={() => setPhase('montage')} />
         </motion.div>
       )}
       {phase === 'montage' && (
-        <motion.div key="montage" exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+        <motion.div key="montage" style={{ width: '100%' }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
           <CharacterMontage onComplete={() => setPhase('input')} />
         </motion.div>
       )}
       {phase === 'input' && (
-        <motion.div key="input" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <motion.div key="input" style={{ width: '100%' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <NameInput />
         </motion.div>
       )}
