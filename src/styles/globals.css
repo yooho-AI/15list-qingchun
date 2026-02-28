@@ -1,27 +1,30 @@
 @import 'tailwindcss';
 
-/* ── CSS 变量（亮色偶像主题） ─────────────────────── */
+/* ── CSS 变量（紫调奢华主题） ─────────────────────── */
 :root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #fff0f5;
-  --bg-hover: rgba(255, 77, 141, 0.06);
-  --bg-active: rgba(255, 77, 141, 0.12);
+  --bg-primary: #fdfbfe;
+  --bg-secondary: #f8f4fc;
+  --bg-hover: rgba(139, 92, 246, 0.06);
+  --bg-active: rgba(139, 92, 246, 0.12);
 
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
+  --text-primary: #1e1b2e;
+  --text-secondary: #6b6580;
+  --text-muted: #9f97b0;
 
-  --border: rgba(255, 77, 141, 0.15);
+  --border: rgba(139, 92, 246, 0.12);
   --primary: #ff4d8d;
   --primary-rgb: 255, 77, 141;
   --primary-light: rgba(255, 77, 141, 0.08);
   --primary-border: rgba(255, 77, 141, 0.25);
-  --accent: #6366f1;
+  --accent: #8b5cf6;
   --gold: #ffd700;
 
   --bg-dash: #fff5f8;
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-card-hover: 0 4px 16px rgba(255, 77, 141, 0.12);
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(139, 92, 246, 0.1);
+  --shadow-card: 0 2px 12px rgba(139, 92, 246, 0.06);
+  --shadow-card-hover: 0 4px 16px rgba(139, 92, 246, 0.12);
+  --shadow-glow: 0 0 16px rgba(255, 77, 141, 0.15);
 
   --font: 'system-ui', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
@@ -31,7 +34,7 @@
 
 body {
   font-family: var(--font);
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
@@ -54,7 +57,7 @@ body {
 @media (min-width: 431px) {
   body {
     min-height: 100vh;
-    background: linear-gradient(135deg, #fff0f5, #fce7f3, #ede9fe);
+    background: linear-gradient(135deg, #f3eeff, #fce7f3, #ede9fe);
   }
 
   #root {
@@ -69,11 +72,11 @@ body {
     height: 100vh;
     max-height: 932px;
     border-radius: 24px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--glass-border);
     box-shadow:
-      0 0 0 1px rgba(255, 77, 141, 0.05),
-      0 25px 50px rgba(0, 0, 0, 0.08),
-      0 0 120px rgba(255, 77, 141, 0.06);
+      0 0 0 1px rgba(139, 92, 246, 0.05),
+      0 25px 50px rgba(0, 0, 0, 0.1),
+      0 0 100px rgba(139, 92, 246, 0.08);
     overflow: hidden;
   }
 }
@@ -82,34 +85,24 @@ body {
 .qc-header {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 8px 8px;
-  background: var(--bg-primary);
-  border-bottom: 1px solid var(--border);
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
   flex-shrink: 0;
   min-height: 44px;
 }
 
 .qc-header-time {
   font-size: 12px;
+  font-weight: 500;
   color: var(--text-secondary);
   white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.qc-header-stats {
-  display: flex;
-  align-items: center;
-  gap: 4px;
   flex: 1;
-  justify-content: center;
-  min-width: 0;
-}
-
-.qc-header-stat {
-  font-size: 10px;
-  font-weight: 600;
-  white-space: nowrap;
+  text-align: center;
+  letter-spacing: 0.5px;
 }
 
 .qc-header-btn {
@@ -120,15 +113,16 @@ body {
   justify-content: center;
   background: none;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   color: var(--text-secondary);
   font-size: 16px;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .qc-header-btn:active {
   background: var(--bg-active);
+  transform: scale(0.92);
 }
 
 /* ── 底部 TabBar ──────────────────────────────────── */
@@ -137,8 +131,10 @@ body {
   justify-content: space-around;
   align-items: center;
   height: 56px;
-  background: var(--bg-primary);
-  border-top: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--glass-border);
   padding-bottom: env(safe-area-inset-bottom);
   flex-shrink: 0;
 }
@@ -147,22 +143,38 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 6px 16px;
+  gap: 3px;
+  padding: 6px 20px;
   font-size: 10px;
   color: var(--text-muted);
   background: none;
   border: none;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.25s;
+  position: relative;
 }
 
 .qc-tab-item span:first-child {
   font-size: 20px;
+  transition: transform 0.25s;
 }
 
 .qc-tab-active {
   color: var(--primary);
+}
+
+.qc-tab-active span:first-child {
+  transform: scale(1.1);
+}
+
+.qc-tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--primary);
 }
 
 /* ── 通用卡片 ─────────────────────────────────────── */
@@ -179,32 +191,38 @@ body {
   align-self: flex-start;
   max-width: 85%;
   padding: 12px 16px;
-  background: var(--bg-secondary);
-  border-radius: 4px 16px 16px 16px;
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: 4px 18px 18px 18px;
   margin-bottom: 8px;
   font-size: 14px;
   line-height: 1.7;
   color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.05);
 }
 
 .qc-bubble-player {
   align-self: flex-end;
   max-width: 75%;
-  padding: 10px 14px;
-  background: linear-gradient(135deg, var(--primary), #f472b6);
+  padding: 10px 16px;
+  background: linear-gradient(135deg, var(--primary), #a855f7);
   color: white;
-  border-radius: 16px 4px 16px 16px;
+  border-radius: 18px 4px 18px 18px;
   margin-bottom: 8px;
   font-size: 14px;
   line-height: 1.5;
+  box-shadow: 0 2px 12px rgba(255, 77, 141, 0.2);
 }
 
 .qc-bubble-system {
   align-self: center;
-  padding: 6px 14px;
-  background: var(--bg-hover);
-  border-radius: 12px;
-  font-size: 12px;
+  padding: 5px 14px;
+  background: rgba(139, 92, 246, 0.06);
+  border: 1px solid rgba(139, 92, 246, 0.08);
+  border-radius: 20px;
+  font-size: 11px;
   color: var(--text-muted);
   margin-bottom: 8px;
   text-align: center;
@@ -227,7 +245,7 @@ body {
 .qc-bubble-npc .stat-changes {
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(139, 92, 246, 0.08);
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -236,9 +254,9 @@ body {
 .qc-bubble-npc .stat-change {
   font-size: 12px;
   font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.03);
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(139, 92, 246, 0.06);
 }
 
 .qc-bubble-npc .stat-up { color: #10b981; }
@@ -254,24 +272,27 @@ body {
 
 .qc-quick-btn {
   padding: 8px 12px;
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  background: rgba(139, 92, 246, 0.04);
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  border-radius: 20px;
   color: var(--text-secondary);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
   text-align: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .qc-quick-btn:active {
-  background: var(--primary-light);
+  background: rgba(255, 77, 141, 0.1);
   border-color: var(--primary-border);
   color: var(--primary);
+  transform: scale(0.96);
 }
 
 .qc-quick-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
@@ -282,24 +303,28 @@ body {
   gap: 8px;
   padding: 8px 12px;
   padding-bottom: calc(8px + env(safe-area-inset-bottom));
-  background: var(--bg-primary);
-  border-top: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--glass-border);
 }
 
 .qc-input {
   flex: 1;
-  padding: 10px 14px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 20px;
+  padding: 10px 16px;
+  background: rgba(139, 92, 246, 0.04);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  border-radius: 22px;
   font-size: 14px;
   color: var(--text-primary);
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.25s;
 }
 
 .qc-input:focus {
-  border-color: var(--primary);
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .qc-input::placeholder {
@@ -310,7 +335,7 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), #f472b6);
+  background: linear-gradient(135deg, var(--primary), #a855f7);
   border: none;
   color: white;
   font-size: 16px;
@@ -318,25 +343,27 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s, opacity 0.2s;
+  transition: all 0.2s;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(255, 77, 141, 0.25);
 }
 
 .qc-send-btn:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
 .qc-send-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .qc-item-btn {
   width: 36px;
   height: 36px;
-  border-radius: 12px;
-  background: var(--bg-hover);
-  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.06);
+  border: 1px solid rgba(139, 92, 246, 0.12);
   font-size: 16px;
   cursor: pointer;
   display: flex;
@@ -344,6 +371,7 @@ body {
   justify-content: center;
   position: relative;
   flex-shrink: 0;
+  transition: all 0.2s;
 }
 
 .qc-item-badge {
@@ -363,43 +391,42 @@ body {
   padding: 0 4px;
 }
 
-/* ── 信笺卡片 ─────────────────────────────────────── */
+/* ── 信笺卡片（暗色电影风） ──────────────────────── */
 .qc-letter-card {
-  margin: 16px;
-  padding: 24px 20px;
-  background: linear-gradient(135deg, #fff0f5, #fce7f3);
-  border: 1px solid var(--border);
+  margin: 20px 16px;
+  padding: 32px 24px;
+  background: linear-gradient(135deg, #1a1025, #2d1b3d, #1e1030);
+  border: 1px solid rgba(168, 85, 247, 0.2);
   border-radius: 20px;
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
-.qc-letter-emoji {
-  font-size: 48px;
-  margin-bottom: 12px;
-}
-
-.qc-letter-genre {
-  font-size: 11px;
-  color: var(--primary);
-  background: var(--primary-light);
-  padding: 2px 10px;
-  border-radius: 10px;
-  display: inline-block;
-  margin-bottom: 8px;
+.qc-letter-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255, 77, 141, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 60%);
+  pointer-events: none;
 }
 
 .qc-letter-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 4px;
+  color: #fff;
+  margin-bottom: 8px;
+  position: relative;
+  text-shadow: 0 0 20px rgba(255, 77, 141, 0.3);
 }
 
 .qc-letter-desc {
   font-size: 13px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.8;
+  position: relative;
 }
 
 /* ── 场景 Tab ─────────────────────────────────────── */

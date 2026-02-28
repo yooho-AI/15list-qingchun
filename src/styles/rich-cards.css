@@ -100,7 +100,7 @@
   margin-top: 4px;
 }
 
-/* ── NPC 气泡行（头像 + 气泡） ───────────────────────── */
+/* ── NPC 气泡行（头像 + 毛玻璃气泡） ──────────────── */
 .qc-npc-row {
   display: flex;
   align-items: flex-end;
@@ -111,23 +111,28 @@
 }
 
 .qc-npc-avatar {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
   object-position: center top;
-  border: 1.5px solid var(--border);
+  border: 2px solid var(--glass-border);
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.1);
 }
 
 .qc-npc-bubble {
   padding: 12px 16px;
-  background: var(--bg-secondary);
-  border-radius: 4px 16px 16px 16px;
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: 4px 18px 18px 18px;
   font-size: 14px;
   line-height: 1.7;
   color: var(--text-primary);
   min-width: 0;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.05);
 }
 
 .qc-npc-bubble .dialogue-line { margin-bottom: 4px; }
@@ -137,7 +142,7 @@
 .qc-npc-bubble .stat-changes {
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(139, 92, 246, 0.08);
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -146,9 +151,9 @@
 .qc-npc-bubble .stat-change {
   font-size: 12px;
   font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.03);
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(139, 92, 246, 0.06);
 }
 
 .qc-npc-bubble .stat-up { color: #10b981; }

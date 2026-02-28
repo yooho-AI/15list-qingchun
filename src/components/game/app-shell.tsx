@@ -1,14 +1,13 @@
 /**
- * [INPUT]: 依赖 store.ts 状态(含抽屉/记录)，bgm.ts 音频，data.ts 常量，dashboard-drawer.tsx
+ * [INPUT]: 依赖 store.ts 状态(含抽屉/记录/时间)，bgm.ts 音频，dashboard-drawer.tsx
  * [OUTPUT]: 对外提供 AppShell 组件
- * [POS]: 游戏主框架：Header(📓+时间+属性+🎵+☰+📜) + 三向手势Tab内容区 + TabBar + DashboardDrawer + RecordSheet + Toast
+ * [POS]: 游戏主框架：Header(📓+时间+🎵+☰+📜) + 三向手势Tab内容区 + TabBar + DashboardDrawer + RecordSheet + Toast
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useGameStore, PERIODS, GLOBAL_STAT_METAS } from '@/lib/store'
-import type { GlobalResources } from '@/lib/store'
+import { useGameStore, PERIODS } from '@/lib/store'
 import { useBgm } from '@/lib/bgm'
 import TabDialogue from './tab-dialogue'
 import TabScene from './tab-scene'
@@ -127,7 +126,6 @@ interface AppShellProps {
 export default function AppShell({ onMenuOpen }: AppShellProps) {
   const currentDay = useGameStore((s) => s.currentDay)
   const currentPeriodIndex = useGameStore((s) => s.currentPeriodIndex)
-  const globalResources = useGameStore((s) => s.globalResources)
   const activeTab = useGameStore((s) => s.activeTab)
   const setActiveTab = useGameStore((s) => s.setActiveTab)
   const showDashboard = useGameStore((s) => s.showDashboard)
@@ -136,7 +134,6 @@ export default function AppShell({ onMenuOpen }: AppShellProps) {
   const toggleRecords = useGameStore((s) => s.toggleRecords)
 
   const period = PERIODS[currentPeriodIndex]
-  const mentalWarning = globalResources.mental <= 40
 
   // ── Toast 通知 ──
   const [toast, setToast] = useState<string | null>(null)
@@ -179,20 +176,8 @@ export default function AppShell({ onMenuOpen }: AppShellProps) {
         <button className={`${P}-header-btn`} onClick={toggleDashboard}>📓</button>
 
         <span className={`${P}-header-time`}>
-          第{currentDay}期·{period?.name}
+          第{currentDay}期 · {period?.name}
         </span>
-
-        <div className={`${P}-header-stats`}>
-          {GLOBAL_STAT_METAS.map((meta) => (
-            <span
-              key={meta.key}
-              className={`${P}-header-stat ${meta.key === 'mental' && mentalWarning ? `${P}-mental-warning` : ''}`}
-              style={{ color: meta.color }}
-            >
-              {meta.icon}{globalResources[meta.key as keyof GlobalResources]}
-            </span>
-          ))}
-        </div>
 
         <MusicPlayer />
         <button className={`${P}-header-btn`} onClick={onMenuOpen}>☰</button>
