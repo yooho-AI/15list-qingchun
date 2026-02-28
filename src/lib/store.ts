@@ -390,9 +390,11 @@ export const useGameStore = create<GameStore>()(
         get().addStoryRecord(charName ?? '旁白', fullContent.slice(0, 30))
         get().advanceTime()
         get().saveGame()
-      } catch {
+      } catch (err) {
         set((s) => { s.isTyping = false; s.streamingContent = '' })
-        get().addSystemMessage('网络连接异常，请重试。')
+        const msg = err instanceof Error ? err.message : String(err)
+        console.error('[sendMessage]', msg)
+        get().addSystemMessage(`网络异常: ${msg.slice(0, 80)}`)
       }
     },
 
