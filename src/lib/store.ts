@@ -79,7 +79,7 @@ interface GameActions {
   selectCharacter: (charId: string) => void
   selectScene: (sceneId: string) => void
   setActiveTab: (tab: 'dialogue' | 'scene' | 'character') => void
-  sendMessage: (text: string) => Promise<void>
+  sendMessage: (text: string, forceAdvance?: boolean) => Promise<void>
   advanceTime: () => void
   useItem: (itemId: string) => void
   checkEnding: () => void
@@ -199,7 +199,12 @@ ${buildStatsSnapshot(state)}
 - 每段回复 200-400 字
 - 角色对话：【角色名】"对话内容"
 - 动作描写：（动作或旁白描述）
-- 数值变化：【角色名 数值+N】或【数值-N】（全局属性如 Vocal/Dance/颜值/粉丝/心理）`
+- 数值变化：【角色名 数值+N】或【数值-N】（全局属性如 Vocal/Dance/颜值/粉丝/心理）
+
+## 时间推进规则
+- 当玩家执行了消耗时间的实质行动（训练、移动场景、参加活动、剧情事件等），在回复末尾单独一行写 【推进时间】
+- 纯闲聊、追问、观察环境、简单对话不消耗时间，不写【推进时间】
+- 不要在叙述中自行描写时间跳转（如"接下来是第X期"），时间由系统自动管理`
 }
 
 // ── Store ────────────────────────────────────────────
@@ -310,7 +315,7 @@ export const useGameStore = create<GameStore>()(
       set((s) => { s.activeTab = tab })
     },
 
-    sendMessage: async (text: string) => {
+    sendMessage: async (text: string, forceAdvance?: boolean) => {
       set((s) => {
         s.messages.push({
           id: makeId(), role: 'user', content: text, timestamp: Date.now(),
@@ -374,6 +379,10 @@ export const useGameStore = create<GameStore>()(
           }
         })
 
+        // 检测【推进时间】标记并清除（不显示给玩家）
+        const shouldAdvance = forceAdvance || /【推进时间】/.test(fullContent)
+        fullContent = fullContent.replace(/\n?【推进时间】/g, '').trimEnd()
+
         const charName = get().currentCharacter
           ? get().characters[get().currentCharacter!]?.name
           : null
@@ -388,7 +397,7 @@ export const useGameStore = create<GameStore>()(
         })
 
         get().addStoryRecord(charName ?? '旁白', fullContent.slice(0, 30))
-        get().advanceTime()
+        if (shouldAdvance) get().advanceTime()
         get().saveGame()
       } catch (err) {
         set((s) => { s.isTyping = false; s.streamingContent = '' })

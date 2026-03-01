@@ -267,7 +267,7 @@ export default function TabDialogue() {
   const handleQuickAction = useCallback((action: string) => {
     if (isTyping) return
     setChoicesOpen(false)
-    sendMessage(action)
+    sendMessage(action, true)
   }, [isTyping, sendMessage])
 
   const char = currentCharacter ? characters[currentCharacter] : null
