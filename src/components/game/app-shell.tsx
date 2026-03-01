@@ -1,7 +1,7 @@
 /**
  * [INPUT]: 依赖 store.ts 状态(含抽屉/记录/时间)，bgm.ts 音频，dashboard-drawer.tsx
  * [OUTPUT]: 对外提供 AppShell 组件
- * [POS]: 游戏主框架：Header(📓+时间+🎵+☰+📜) + 三向手势Tab内容区 + TabBar + DashboardDrawer + RecordSheet + Toast
+ * [POS]: 游戏主框架：Header(时间+🎵+☰) + 三向手势Tab内容区 + 5键TabBar(手册+场景+对话+人物+事件) + DashboardDrawer + RecordSheet + Toast
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
@@ -13,6 +13,7 @@ import TabDialogue from './tab-dialogue'
 import TabScene from './tab-scene'
 import TabCharacter from './tab-character'
 import DashboardDrawer from './dashboard-drawer'
+import { Notebook, CalendarCheck } from '@phosphor-icons/react'
 
 const P = 'qc'
 
@@ -173,15 +174,12 @@ export default function AppShell({ onMenuOpen }: AppShellProps) {
     <div className={`${P}-shell`}>
       {/* ── Header ── */}
       <header className={`${P}-header`}>
-        <button className={`${P}-header-btn`} onClick={toggleDashboard}>📓</button>
-
         <span className={`${P}-header-time`}>
           第{currentDay}期 · {period?.name}
         </span>
 
         <MusicPlayer />
         <button className={`${P}-header-btn`} onClick={onMenuOpen}>☰</button>
-        <button className={`${P}-header-btn`} onClick={toggleRecords}>📜</button>
       </header>
 
       {/* ── Tab 内容区（三向手势绑定） ── */}
@@ -221,8 +219,15 @@ export default function AppShell({ onMenuOpen }: AppShellProps) {
         )}
       </AnimatePresence>
 
-      {/* ── TabBar ── */}
+      {/* ── TabBar (5键) ── */}
       <nav className={`${P}-tab-bar`}>
+        <button
+          className={`${P}-tab-item ${showDashboard ? `${P}-tab-active` : ''}`}
+          onClick={toggleDashboard}
+        >
+          <span><Notebook size={20} weight={showDashboard ? 'fill' : 'regular'} /></span>
+          <span>手册</span>
+        </button>
         {TAB_CONFIG.map((tab) => (
           <button
             key={tab.key}
@@ -233,6 +238,13 @@ export default function AppShell({ onMenuOpen }: AppShellProps) {
             <span>{tab.label}</span>
           </button>
         ))}
+        <button
+          className={`${P}-tab-item ${showRecords ? `${P}-tab-active` : ''}`}
+          onClick={toggleRecords}
+        >
+          <span><CalendarCheck size={20} weight={showRecords ? 'fill' : 'regular'} /></span>
+          <span>事件</span>
+        </button>
       </nav>
 
       {/* ── DashboardDrawer（左抽屉） ── */}
