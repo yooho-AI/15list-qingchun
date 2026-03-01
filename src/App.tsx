@@ -336,6 +336,13 @@ function EndingModal() {
         <button className="qc-start-btn" onClick={resetGame}>
           返回标题
         </button>
+        <button
+          className="qc-start-btn-secondary"
+          style={{ marginTop: 8 }}
+          onClick={() => useGameStore.setState({ endingType: null })}
+        >
+          继续探索
+        </button>
       </motion.div>
     </motion.div>
   )
