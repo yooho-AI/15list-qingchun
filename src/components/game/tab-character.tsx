@@ -1,15 +1,17 @@
 /**
- * [INPUT]: 依赖 store.ts 状态（角色/数值），data.ts 角色/工具函数
+ * [INPUT]: 依赖 store.ts 状态（角色/数值），data.ts 角色/工具函数，stream.ts SSE通信
  * [OUTPUT]: 对外提供 TabCharacter 组件
- * [POS]: 人物 Tab：立绘(9:16) + 数值条(category分组) + SVG RelationGraph + 关系列表(真实头像) + CharacterDossier 全屏档案
+ * [POS]: 人物 Tab：立绘(9:16) + 数值条(category分组) + SVG RelationGraph + 关系列表(真实头像) + CharacterDossier 全屏档案 + PrivateChatSheet 私聊小窗
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
-import { useState } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useGameStore, GLOBAL_STAT_METAS } from '@/lib/store'
 import type { StatMeta, GlobalResources, Character, CharacterStats } from '@/lib/store'
 import { getAvailableCharacters, getStatLevel } from '@/lib/data'
+import { streamChat } from '@/lib/stream'
+import type { Message as StreamMessage } from '@/lib/stream'
 
 const P = 'qc'
 
@@ -146,6 +148,138 @@ function CharacterDossier({ char, stats, onClose }: {
   )
 }
 
+// ── 私聊小窗 ────────────────────────────────────────
+interface PChatMsg {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+function PrivateChatSheet({ char, onClose }: {
+  char: Character; onClose: () => void
+}) {
+  const [messages, setMessages] = useState<PChatMsg[]>([])
+  const [input, setInput] = useState('')
+  const [typing, setTyping] = useState(false)
+  const [streaming, setStreaming] = useState('')
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const abortRef = useRef(false)
+
+  const scrollToBottom = useCallback(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [])
+
+  useEffect(() => { scrollToBottom() }, [messages, streaming, scrollToBottom])
+
+  const sendMessage = async () => {
+    const text = input.trim()
+    if (!text || typing) return
+
+    setInput('')
+    const newMsg: PChatMsg = { role: 'user', content: text }
+    setMessages(prev => [...prev, newMsg])
+    setTyping(true)
+    setStreaming('')
+    abortRef.current = false
+
+    const systemPrompt: StreamMessage = {
+      role: 'system',
+      content: `你是${char.name}，${char.age}岁，${char.title}。\n性格：${char.personality}\n说话风格：${char.speakingStyle}\n行为模式：${char.behaviorPatterns}\n\n这是一次日常私聊，请以${char.name}的口吻与用户自然对话。\n不涉及游戏剧情推进，不输出数值变化，不给选项。\n回复控制在100-200字以内。`
+    }
+
+    const apiMessages: StreamMessage[] = [
+      systemPrompt,
+      ...([...messages, newMsg].map(m => ({
+        role: m.role as StreamMessage['role'],
+        content: m.content,
+      })))
+    ]
+
+    let accumulated = ''
+
+    try {
+      await streamChat(
+        apiMessages,
+        (chunk) => {
+          if (abortRef.current) return
+          accumulated += chunk
+          setStreaming(accumulated)
+        },
+        () => {
+          if (abortRef.current) return
+          setMessages(prev => [...prev, { role: 'assistant', content: accumulated }])
+          setStreaming('')
+          setTyping(false)
+        }
+      )
+    } catch {
+      setStreaming('')
+      setTyping(false)
+      setMessages(prev => [...prev, { role: 'assistant', content: '（网络异常，请稍后再试）' }])
+    }
+  }
+
+  const handleClose = () => {
+    abortRef.current = true
+    onClose()
+  }
+
+  return (
+    <motion.div
+      className={`${P}-pchat-overlay`}
+      initial={{ x: '100%' }}
+      animate={{ x: 0 }}
+      exit={{ x: '100%' }}
+      transition={{ type: 'spring', damping: 25, stiffness: 250 }}
+    >
+      {/* Header */}
+      <div className={`${P}-pchat-header`}>
+        <img className={`${P}-pchat-avatar`} src={char.portrait} alt={char.name} />
+        <div className={`${P}-pchat-name`}>{char.name}</div>
+        <button className={`${P}-pchat-close`} onClick={handleClose}>✕</button>
+      </div>
+
+      {/* Messages */}
+      <div className={`${P}-pchat-messages`} ref={scrollRef}>
+        {messages.length === 0 && !streaming && (
+          <div className={`${P}-pchat-hint`}>与{char.name}开始私聊吧~</div>
+        )}
+        {messages.map((m, i) => (
+          <div key={i} className={`${P}-pchat-bubble ${P}-pchat-${m.role}`}>
+            {m.content}
+          </div>
+        ))}
+        {streaming && (
+          <div className={`${P}-pchat-bubble ${P}-pchat-assistant`}>
+            {streaming}
+            <span className={`${P}-pchat-cursor`}>▍</span>
+          </div>
+        )}
+      </div>
+
+      {/* Input */}
+      <div className={`${P}-pchat-input-area`}>
+        <input
+          className={`${P}-pchat-input`}
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && !e.nativeEvent.isComposing && sendMessage()}
+          placeholder="说点什么..."
+          disabled={typing}
+        />
+        <button
+          className={`${P}-pchat-send`}
+          onClick={sendMessage}
+          disabled={typing || !input.trim()}
+        >
+          发送
+        </button>
+      </div>
+    </motion.div>
+  )
+}
+
 // ── SVG 关系图常量 ───────────────────────────────────
 const W = 380, H = 300, CX = 190, CY = 150, R = 105, NODE_R = 22
 
@@ -277,6 +411,7 @@ export default function TabCharacter() {
   const globalResources = useGameStore((s) => s.globalResources)
   const selectCharacter = useGameStore((s) => s.selectCharacter)
   const [dossierChar, setDossierChar] = useState<string | null>(null)
+  const [pchatCharId, setPchatCharId] = useState<string | null>(null)
 
   const available = getAvailableCharacters(currentDay, characters)
   const char = currentCharacter ? characters[currentCharacter] : null
@@ -453,6 +588,15 @@ export default function TabCharacter() {
                   {firstMeta.icon}{val}
                 </span>
               )}
+              <span
+                className={`${P}-pchat-trigger`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setPchatCharId(id)
+                }}
+              >
+                💬
+              </span>
             </button>
           )
         })}
@@ -467,6 +611,17 @@ export default function TabCharacter() {
             char={dossierCharData}
             stats={dossierStats}
             onClose={() => setDossierChar(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* ── 私聊小窗 ── */}
+      <AnimatePresence>
+        {pchatCharId && characters[pchatCharId] && (
+          <PrivateChatSheet
+            key={pchatCharId}
+            char={characters[pchatCharId]}
+            onClose={() => setPchatCharId(null)}
           />
         )}
       </AnimatePresence>

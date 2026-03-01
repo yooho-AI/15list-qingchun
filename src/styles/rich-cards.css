@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 globals.css CSS 变量
- * [OUTPUT]: 富UI组件全部样式——场景卡/期变卡/档案卡/荧光棒/NPC气泡/DashboardDrawer/RecordSheet/SVG关系图/Toast
+ * [OUTPUT]: 富UI组件全部样式——场景卡/期变卡/档案卡/荧光棒/NPC气泡/DashboardDrawer/RecordSheet/SVG关系图/Toast/私聊小窗
  * [POS]: styles 的富消息专用样式，承载所有新增视觉组件
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -991,4 +991,177 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   z-index: 100;
   white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════════════════
+   私聊小窗 (PrivateChatSheet)
+   ══════════════════════════════════════════════════════ */
+
+.qc-pchat-trigger {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 77, 141, 0.08);
+  font-size: 15px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.qc-pchat-trigger:active {
+  background: rgba(255, 77, 141, 0.2);
+}
+
+.qc-pchat-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+.qc-pchat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.qc-pchat-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  border: 2px solid var(--glass-border);
+}
+
+.qc-pchat-name {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.qc-pchat-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qc-pchat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.qc-pchat-hint {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-top: 40%;
+}
+
+.qc-pchat-bubble {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.qc-pchat-user {
+  align-self: flex-end;
+  background: var(--primary);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.qc-pchat-assistant {
+  align-self: flex-start;
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  border-bottom-left-radius: 4px;
+}
+
+.qc-pchat-cursor {
+  animation: qcBlink 1s step-end infinite;
+  color: var(--primary);
+}
+
+.qc-pchat-input-area {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+
+.qc-pchat-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.qc-pchat-input:focus {
+  border-color: var(--primary);
+}
+
+.qc-pchat-input::placeholder {
+  color: var(--text-muted);
+}
+
+.qc-pchat-send {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.qc-pchat-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.qc-pchat-send:not(:disabled):active {
+  opacity: 0.8;
 }

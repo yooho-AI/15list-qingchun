@@ -8,7 +8,7 @@ L2 | 父级: /15list-qingchun/CLAUDE.md
 - `dashboard-drawer.tsx`: 练习生手帐，左侧滑入抽屉，毛玻璃卡片+淡粉紫渐变。FrontPage(紧凑横排圆形徽章+星形行动力)/RelationshipMini(3男主圆头像+主题色好感)/CharacterGallery(2:3竖版立绘+5颗心好感)/SceneMap(横向滚动真实背景缩略图)/TrainingGoals(checkbox风格)/StatusBoard(彩色pill属性+道具贴纸)+底部MiniPlayer。Reorder拖拽排序+localStorage `qc-dash-order-v2` 持久化
 - `tab-dialogue.tsx`: 对话 Tab，富消息路由(SceneTransitionCard/EpisodeCard逐字打字机/NPC头像气泡/系统/玩家) + LetterCard + StreamingMessage + QuickActions(2×2) + InventorySheet + InputArea
 - `tab-scene.tsx`: 场景 Tab，SceneHeroCard(9:16大图) + 真实立绘头像人物标签 + 地点列表(解锁/锁定/当前)
-- `tab-character.tsx`: 人物 Tab，PortraitHero(9:16立绘) + 玩家属性面板 + NPC数值条(category分组) + SVG RelationGraph(环形节点图+连线+关系标签) + 真实头像关系列表 + CharacterDossier全屏右滑入档案卡
+- `tab-character.tsx`: 人物 Tab，PortraitHero(9:16立绘) + 玩家属性面板 + NPC数值条(category分组) + SVG RelationGraph(环形节点图+连线+关系标签) + 真实头像关系列表(含💬私聊按钮) + CharacterDossier全屏右滑入档案卡 + PrivateChatSheet私聊小窗(独立状态+streamChat直调+角色人设prompt)
 
 ## 交互架构
 
